@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E9E7E1;font-family:Manrope,system-ui,sans-serif;color:#1C1B18;-webkit-font-smoothing:antialiased}
+a{color:#1F7A4D}a:hover{color:#16583A}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<section data-screen-label="Concursos" style="padding:64px 64px 40px">
+  <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+    <div style="font-size:40px;font-weight:800;letter-spacing:-0.02em">Concursos</div>
+    <div style="font-size:18px;color:#66625A">Nova funcionalidade · telas 16–20</div>
+  </div>
+  <div style="font-size:15px;color:#66625A;margin-bottom:32px;max-width:720px;line-height:1.5">O cliente publica o serviço e o seu orçamento. Os prestadores aceitam o valor ou fazem uma contraproposta justificada. O cliente escolhe entre quem respondeu.</div>
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">16 · Cliente · Publicar concurso</div>
+      <div data-screen-label="16 Publicar Concurso" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 20px;display:flex;flex-direction:column;gap:13px;flex:1">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+            <div style="display:flex;flex-direction:column"><div style="font-size:18px;font-weight:800">Publicar concurso</div><div style="font-size:12.5px;color:#66625A">Receba propostas de vários prestadores</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">O que precisa?</div>
+            <div style="height:46px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;padding:0 14px;font-size:15px">Substituir canos da casa de banho</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Categoria</div>
+            <div style="height:46px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px"><span>Canalização</span><span style="color:#66625A">▾</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Descrição</div>
+            <div style="height:70px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;padding:10px 14px;font-size:14px;line-height:1.45">Canos por baixo do lavatório com fuga. Trocar tubo e sifão.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">O seu orçamento</div>
+            <div style="height:60px;border-radius:14px;border:1.5px solid #1F7A4D;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px"><span style="font-size:26px;font-weight:800;letter-spacing:-0.01em">1 500</span><span style="font-size:15px;font-weight:700;color:#66625A">MT</span></div>
+            <div style="font-size:12px;color:#66625A">Serviços parecidos em Maputo: 1 200 – 2 000 MT</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:700">Quando</div><div style="height:46px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;padding:0 14px;font-size:14px">Esta semana</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:700">Propostas até</div><div style="height:46px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;padding:0 14px;font-size:14px">48 horas</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+            <div style="width:48px;height:48px;border-radius:12px;background:repeating-linear-gradient(135deg,#E8E4DB 0 5px,#F1EEE7 5px 10px);flex-shrink:0"></div>
+            <div style="width:48px;height:48px;border-radius:12px;border:1.5px dashed #B9B4AA;display:flex;align-items:center;justify-content:center;font-size:20px;color:#66625A;flex-shrink:0">+</div>
+            <span style="color:#66625A">Polana Caniço A, Rua 4</span>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Publicar concurso</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">17 · Prestador · Oportunidades</div>
+      <div data-screen-label="17 Oportunidades" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 12px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="font-size:26px;font-weight:800;letter-spacing:-0.02em">Oportunidades</div>
+            <div style="font-size:13.5px;color:#66625A">Concursos abertos na sua zona</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="height:34px;padding:0 12px;border-radius:17px;background:#1F7A4D;color:#fff;display:flex;align-items:center;font-size:13px;font-weight:700">Canalização</div>
+            <div style="height:34px;padding:0 12px;border-radius:17px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;font-size:13px;font-weight:700">Até 10 km ▾</div>
+            <div style="height:34px;padding:0 12px;border-radius:17px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;font-size:13px;font-weight:700">Mais recentes ▾</div>
+          </div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ tenders }}" as="t" hint-placeholder-count="4">
+            <div style="padding:14px;border-radius:16px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#66625A"><span>{{ t.area }} · {{ t.dist }}</span><span style="font-weight:700;color:#7A5410">Fecha em {{ t.left }}</span></div>
+              <div style="font-size:15.5px;font-weight:800;line-height:1.3">{{ t.title }}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><span style="font-size:12px;color:#66625A">Orçamento </span><span style="font-size:17px;font-weight:800">{{ t.budget }}</span></div>
+                <span style="font-size:12.5px;color:#66625A">{{ t.count }} propostas</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">18 · Prestador · Responder</div>
+      <div data-screen-label="18 Responder Concurso" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 20px;display:flex;flex-direction:column;gap:13px;flex:1">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+            <div style="font-size:18px;font-weight:800">Concurso</div>
+          </div>
+          <div style="padding:14px;border-radius:16px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:16px;font-weight:800">Substituir canos da casa de banho</div>
+            <div style="font-size:13.5px;line-height:1.45;color:#3A3833">Canos por baixo do lavatório com fuga. Trocar tubo e sifão.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px">
+              <span style="padding:5px 9px;border-radius:9px;background:#EEEBE4;font-weight:700">Polana Caniço A</span>
+              <span style="padding:5px 9px;border-radius:9px;background:#EEEBE4;font-weight:700">Esta semana</span>
+              <span style="padding:5px 9px;border-radius:9px;background:#EEEBE4;font-weight:700">Ana S. ★ 4.9</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:6px;border-top:1px solid #F0EDE6"><span style="font-size:13px;color:#66625A">Orçamento do cliente</span><span style="font-size:20px;font-weight:800">1 500 MT</span></div>
+          </div>
+          <div style="font-size:13px;font-weight:700">A sua resposta</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="padding:10px 12px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:800">Aceitar</span><span style="font-size:12px;color:#66625A">por 1 500 MT</span></div>
+            <div style="padding:10px 12px;border-radius:12px;border:1.5px solid #1F7A4D;background:#E3F0E8;color:#16583A;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:800">Contraproposta</span><span style="font-size:12px">outro valor</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">O seu valor</div>
+            <div style="height:54px;border-radius:14px;border:1.5px solid #1F7A4D;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px"><span style="font-size:22px;font-weight:800">1 800</span><span style="font-size:14px;font-weight:700;color:#66625A">MT · +300</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Porquê este valor?</div>
+            <div style="height:84px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;padding:10px 14px;font-size:14px;line-height:1.45">O orçamento não cobre o material: 2 sifões e tubo PVC novo custam cerca de 300 MT.</div>
+            <div style="font-size:12px;color:#66625A">O cliente vê esta explicação junto do valor.</div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Enviar contraproposta</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">19 · Cliente · Escolher prestador</div>
+      <div data-screen-label="19 Propostas Recebidas" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 12px;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid #E4E0D7">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">←</div>
+            <div style="display:flex;flex-direction:column;min-width:0"><div style="font-size:16px;font-weight:800">Substituir canos da casa de banho</div><div style="font-size:12.5px;color:#66625A">Orçamento 1 500 MT · fecha em 18 h</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><b>3 propostas</b><span style="font-weight:700">Melhor avaliados ▾</span></div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:12px 20px 0;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ proposals }}" as="p" hint-placeholder-count="3">
+            <div style="padding:13px;border-radius:16px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;gap:10px;align-items:center">
+                <div style="width:40px;height:40px;border-radius:12px;flex-shrink:0;background:repeating-linear-gradient(135deg,#E8E4DB 0 5px,#F1EEE7 5px 10px)"></div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:6px"><span style="font-size:14.5px;font-weight:800">{{ p.name }}</span><span style="width:15px;height:15px;border-radius:50%;background:#1F7A4D;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:800">✓</span></div>
+                  <div style="font-size:12px;color:#66625A"><span style="color:#C98A1A">★</span> {{ p.rating }} · {{ p.jobs }} serviços</div>
+                </div>
+                <div style="text-align:right"><div style="font-size:17px;font-weight:800">{{ p.price }}</div><div style="font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;background:{{ p.bg }};color:{{ p.fg }}">{{ p.kind }}</div></div>
+              </div>
+              <div style="font-size:13px;line-height:1.45;color:#3A3833;padding:9px 11px;border-radius:10px;background:#F4F2ED">{{ p.why }}</div>
+              <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:8px">
+                <div style="height:40px;border-radius:11px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px">Ver perfil</div>
+                <div style="height:40px;border-radius:11px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px">Escolher</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">20 · Cliente · Confirmação</div>
+      <div data-screen-label="20 Prestador Escolhido" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:40px 24px 20px;display:flex;flex-direction:column;gap:20px;flex:1">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+            <div style="width:72px;height:72px;border-radius:50%;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800">✓</div>
+            <div style="font-size:24px;font-weight:800;letter-spacing:-0.01em;text-wrap:pretty">Escolheu Fernando Chissano</div>
+            <div style="font-size:14px;color:#66625A;line-height:1.5;text-wrap:pretty">Ele foi notificado e vai confirmar a hora. Os outros prestadores são informados de que o concurso fechou.</div>
+          </div>
+          <div style="border:1px solid #E4E0D7;border-radius:16px;background:#fff">
+            <div style="display:flex;justify-content:space-between;padding:13px 14px;border-bottom:1px solid #F0EDE6;font-size:14px"><span style="color:#66625A">Serviço</span><b>Canos da casa de banho</b></div>
+            <div style="display:flex;justify-content:space-between;padding:13px 14px;border-bottom:1px solid #F0EDE6;font-size:14px"><span style="color:#66625A">Valor acordado</span><b>1 800 MT</b></div>
+            <div style="display:flex;justify-content:space-between;padding:13px 14px;font-size:14px"><span style="color:#66625A">Estado</span><span style="font-size:12px;font-weight:800;padding:4px 10px;border-radius:10px;background:#E3F0E8;color:#16583A">Aceite</span></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="height:52px;border-radius:14px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px">Ligar</div>
+            <div style="height:52px;border-radius:14px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px">WhatsApp</div>
+          </div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Ver em Meus pedidos</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section data-screen-label="Cliente" style="padding:64px 64px 40px">
+  <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:32px;flex-wrap:wrap">
+    <div style="font-size:40px;font-weight:800;letter-spacing:-0.02em">Biscate Fácil</div>
+    <div style="font-size:18px;color:#66625A">Módulo do cliente · telas 01–09</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">01 · Boas-vindas</div>
+      <div data-screen-label="01 Boas-vindas" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#1F7A4D;color:#fff;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:28px 28px 28px;gap:28px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;background:#fff;color:#1F7A4D;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px">BF</div>
+            <div style="font-weight:800;font-size:20px">Biscate Fácil</div>
+          </div>
+          <div style="flex:1;border-radius:24px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.09) 0 8px,rgba(255,255,255,.03) 8px 16px);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,255,255,.8)">foto: profissional a trabalhar</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:32px;line-height:1.1;font-weight:800;letter-spacing:-0.02em;text-wrap:pretty">O profissional certo, perto de si.</div>
+            <div style="font-size:15px;line-height:1.5;color:#DCEBE2">Prestadores verificados, preços claros e avaliações reais em Maputo e Matola.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="height:54px;border-radius:14px;background:#fff;color:#1F7A4D;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Criar conta</div>
+            <div style="height:54px;border-radius:14px;border:1.5px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Entrar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">02 · Login</div>
+      <div data-screen-label="02 Login" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:12px 24px 20px;display:flex;flex-direction:column;gap:22px;flex:1">
+          <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:28px;font-weight:800;letter-spacing:-0.02em">Bem-vindo de volta</div>
+            <div style="font-size:15px;color:#66625A">Entre para ver os seus pedidos.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;background:#EEEBE4;border-radius:12px;padding:4px;gap:4px">
+            <div style="height:40px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 1px 2px rgba(0,0,0,.06)">Telefone</div>
+            <div style="height:40px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#66625A">Email</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700">Número de telefone</div>
+            <div style="height:52px;border-radius:12px;border:1.5px solid #1F7A4D;background:#fff;display:flex;align-items:center;gap:12px;padding:0 14px;font-size:16px"><span style="font-weight:700">+258</span><span style="width:1px;height:22px;background:#E4E0D7"></span><span>84 123 4567</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700">Palavra-passe</div>
+            <div style="height:52px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:16px"><span>••••••••</span><span style="font-size:13px;color:#66625A;font-weight:600">Mostrar</span></div>
+            <div style="font-size:14px;font-weight:700;color:#1F7A4D;align-self:flex-end;padding-top:4px">Recuperar senha</div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Entrar</div>
+          <div style="text-align:center;font-size:14px;color:#66625A">Não tem conta? <span style="color:#1F7A4D;font-weight:700">Criar conta</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">03 · Cadastro</div>
+      <div data-screen-label="03 Cadastro" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:12px 24px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+            <div style="font-size:13px;color:#66625A;font-weight:600">Cliente</div>
+          </div>
+          <div style="font-size:26px;font-weight:800;letter-spacing:-0.02em">Criar conta</div>
+          <sc-for list="{{ signupFields }}" as="f" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;font-weight:700">{{ f.label }}</div>
+              <div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;padding:0 14px;font-size:15px">{{ f.value }}</div>
+            </div>
+          </sc-for>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;font-weight:700">Município</div>
+              <div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px"><span>Matola</span><span style="color:#66625A">▾</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;font-weight:700">Bairro</div>
+              <div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px"><span>Fomento</span><span style="color:#66625A">▾</span></div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Criar conta</div>
+          <div style="text-align:center;font-size:14px;color:#66625A">É prestador? <span style="color:#1F7A4D;font-weight:700">Registe os seus serviços</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">04 · Início</div>
+      <div data-screen-label="04 Home" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="background:#1F7A4D;color:#fff;padding:0 20px 18px;display:flex;flex-direction:column;gap:14px">
+          <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 4px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="font-size:13px;color:#D4E8DB;font-weight:600">Polana Caniço A, Maputo ▾</div>
+              <div style="font-size:22px;font-weight:800">Olá, Ana</div>
+            </div>
+            <div style="width:44px;height:44px;border-radius:50%;background:#fff;color:#1F7A4D;display:flex;align-items:center;justify-content:center;font-weight:800">A</div>
+          </div>
+          <div style="height:50px;border-radius:14px;background:#fff;color:#66625A;display:flex;align-items:center;gap:10px;padding:0 16px;font-size:15px"><span style="font-size:18px;color:#1C1B18">⌕</span>Canalizador, electricista…</div>
+          <div style="display:flex;gap:8px;overflow:hidden">
+            <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="4">
+              <div style="flex-shrink:0;height:32px;padding:0 12px;border-radius:16px;background:rgba(255,255,255,.15);display:flex;align-items:center;font-size:13px;font-weight:600">{{ s }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:18px 20px 0;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:800">Categorias</div><div style="font-size:13px;color:#1F7A4D;font-weight:700">Ver todas</div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px 8px">
+            <sc-for list="{{ categories }}" as="c" hint-placeholder-count="8">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div style="width:54px;height:54px;border-radius:16px;background:#E3F0E8;color:#1F7A4D;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px">{{ c.abbr }}</div>
+                <div style="font-size:11.5px;font-weight:600;text-align:center">{{ c.name }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:17px;font-weight:800">Em destaque perto de si</div>
+          <div style="display:flex;gap:12px">
+            <sc-for list="{{ featured }}" as="p" hint-placeholder-count="2">
+              <div style="flex-shrink:0;width:204px;border-radius:18px;background:#fff;border:1px solid #E4E0D7;overflow:hidden">
+                <div style="height:92px;background:repeating-linear-gradient(135deg,#E8E4DB 0 6px,#F1EEE7 6px 12px);display:flex;align-items:flex-end;justify-content:space-between;padding:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#66625A"><span>foto</span><span style="background:#1F7A4D;color:#fff;font-family:Manrope;font-weight:700;font-size:11px;padding:3px 8px;border-radius:10px">✓ Verificado</span></div>
+                <div style="padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px">
+                  <div style="font-size:15px;font-weight:800">{{ p.name }}</div>
+                  <div style="font-size:12.5px;color:#66625A">{{ p.job }} · {{ p.area }}</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;font-size:13px"><span style="font-weight:700"><span style="color:#C98A1A">★</span> {{ p.rating }}</span><span>desde <b>{{ p.price }}</b></span></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="height:70px;border-top:1px solid #E4E0D7;background:#fff;display:grid;grid-template-columns:repeat(4,1fr)">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#1F7A4D"><div style="width:20px;height:20px;border-radius:6px;background:#1F7A4D"></div>Início</div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#8B877E"><div style="width:20px;height:20px;border-radius:50%;border:2px solid #8B877E"></div>Pesquisar</div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#8B877E"><div style="width:20px;height:20px;border-radius:6px;border:2px solid #8B877E"></div>Pedidos</div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#8B877E"><div style="width:20px;height:20px;border-radius:50%;border:2px solid #8B877E"></div>Conta</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">05 · Pesquisa e filtros</div>
+      <div data-screen-label="05 Pesquisa" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 14px;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid #E4E0D7">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">←</div>
+            <div style="flex:1;height:46px;border-radius:12px;border:1.5px solid #1F7A4D;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600"><span>Electricista</span><span style="color:#66625A">✕</span></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+              <div style="height:34px;padding:0 12px;border-radius:17px;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.color }};display:flex;align-items:center;font-size:13px;font-weight:700">{{ f.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:12px 20px 4px;display:flex;justify-content:space-between;font-size:13px;color:#66625A"><span><b style="color:#1C1B18">24 electricistas</b> em Matola</span><span style="font-weight:700;color:#1C1B18">Melhor avaliados ▾</span></div>
+        <div style="flex:1;overflow:hidden;padding:6px 20px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ results }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex;gap:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #E4E0D7">
+              <div style="width:64px;height:64px;border-radius:14px;flex-shrink:0;background:repeating-linear-gradient(135deg,#E8E4DB 0 5px,#F1EEE7 5px 10px)"></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px"><span style="font-size:15px;font-weight:800">{{ r.name }}</span><span style="width:16px;height:16px;border-radius:50%;background:#1F7A4D;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800">✓</span></div>
+                <div style="font-size:12.5px;color:#66625A">{{ r.area }} · {{ r.jobs }} serviços</div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;padding-top:3px"><span style="font-weight:700"><span style="color:#C98A1A">★</span> {{ r.rating }} <span style="color:#66625A;font-weight:500">({{ r.reviews }})</span></span><span>desde <b>{{ r.price }}</b></span></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">06 · Perfil do prestador (ecrã completo)</div>
+      <div data-screen-label="06 Perfil Prestador" style="width:360px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:170px;background:repeating-linear-gradient(135deg,#DCD8CE 0 8px,#E8E4DB 8px 16px);position:relative;display:flex;flex-direction:column">
+          <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+          <div style="display:flex;justify-content:space-between;padding:0 16px">
+            <div style="width:40px;height:40px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center">←</div>
+            <div style="width:40px;height:40px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center">♡</div>
+          </div>
+          <div style="margin:auto 0 12px 0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#66625A">capa: trabalho recente</div>
+        </div>
+        <div style="padding:0 20px;margin-top:-40px;display:flex;flex-direction:column;gap:14px">
+          <div style="width:84px;height:84px;border-radius:24px;border:4px solid #FAF9F6;background:repeating-linear-gradient(135deg,#CFCAC0 0 5px,#DCD8CE 5px 10px)"></div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:24px;font-weight:800;letter-spacing:-0.01em">Carlos Mabunda</div>
+            <div style="font-size:14px;color:#66625A">Electricista · Matola, Fomento · 8 anos de experiência</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:#E3F0E8;color:#16583A">
+            <div style="width:28px;height:28px;border-radius:50%;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">✓</div>
+            <div style="font-size:13px;line-height:1.35"><b>Identidade verificada</b><br>BI e morada confirmados pela Biscate Fácil</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #E4E0D7;border-radius:14px;background:#fff">
+            <div style="padding:12px 0;text-align:center;border-right:1px solid #E4E0D7"><div style="font-size:18px;font-weight:800"><span style="color:#C98A1A">★</span> 4.8</div><div style="font-size:11.5px;color:#66625A">62 avaliações</div></div>
+            <div style="padding:12px 0;text-align:center;border-right:1px solid #E4E0D7"><div style="font-size:18px;font-weight:800">148</div><div style="font-size:11.5px;color:#66625A">serviços feitos</div></div>
+            <div style="padding:12px 0;text-align:center"><div style="font-size:18px;font-weight:800">96%</div><div style="font-size:11.5px;color:#66625A">recomendam</div></div>
+          </div>
+          <div style="font-size:14px;line-height:1.55;color:#3A3833;text-wrap:pretty">Instalações e reparações eléctricas residenciais e comerciais. Trabalho com material certificado e dou garantia de 30 dias.</div>
+
+          <div style="font-size:17px;font-weight:800;padding-top:6px">Trabalhos realizados</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <sc-for list="{{ portfolio3 }}" as="ph" hint-placeholder-count="3">
+              <div style="aspect-ratio:1;border-radius:12px;background:repeating-linear-gradient(135deg,#E8E4DB 0 5px,#F1EEE7 5px 10px);display:flex;align-items:flex-end;padding:6px;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#66625A">{{ ph }}</div>
+            </sc-for>
+          </div>
+
+          <div style="font-size:17px;font-weight:800;padding-top:6px">Preços</div>
+          <div style="border:1px solid #E4E0D7;border-radius:14px;background:#fff">
+            <sc-for list="{{ prices }}" as="pr" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border-bottom:1px solid #F0EDE6;font-size:14px"><span>{{ pr.name }}</span><b>{{ pr.price }}</b></div>
+            </sc-for>
+            <div style="padding:10px 14px;font-size:12px;color:#66625A">Preços iniciais. O valor final é combinado antes do serviço.</div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:6px"><div style="font-size:17px;font-weight:800">Avaliações</div><div style="font-size:13px;color:#1F7A4D;font-weight:700">Ver 62</div></div>
+          <sc-for list="{{ reviews }}" as="rv" hint-placeholder-count="2">
+            <div style="padding:14px;border-radius:14px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:13px"><b>{{ rv.who }}</b><span style="color:#66625A">{{ rv.when }}</span></div>
+              <div style="color:#C98A1A;font-size:13px;letter-spacing:2px">★★★★★</div>
+              <div style="font-size:14px;line-height:1.45">{{ rv.text }}</div>
+            </div>
+          </sc-for>
+          <div style="height:8px"></div>
+        </div>
+        <div style="padding:14px 20px 22px;border-top:1px solid #E4E0D7;background:#fff;display:flex;gap:10px">
+          <div style="width:52px;height:52px;border-radius:14px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">Ligar</div>
+          <div style="width:52px;height:52px;border-radius:14px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;flex-shrink:0">WhatsApp</div>
+          <div style="flex:1;height:52px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px">Solicitar serviço</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">07 · Solicitação</div>
+      <div data-screen-label="07 Solicitacao" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+            <div style="display:flex;flex-direction:column"><div style="font-size:18px;font-weight:800">Solicitar serviço</div><div style="font-size:12.5px;color:#66625A">a Carlos Mabunda</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Serviço</div>
+            <div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px"><span>Reparação · desde 300 MT</span><span style="color:#66625A">▾</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Descreva o problema</div>
+            <div style="height:88px;border-radius:12px;border:1.5px solid #1F7A4D;background:#fff;padding:12px 14px;font-size:14px;line-height:1.45">As tomadas da cozinha deixaram de funcionar depois da chuva.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:700">Data</div><div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;padding:0 14px;font-size:15px">Qui, 2 Out</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:700">Hora</div><div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;padding:0 14px;font-size:15px">Manhã</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Localização</div>
+            <div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px"><span>Polana Caniço A, Rua 4</span><span style="font-size:13px;color:#1F7A4D;font-weight:700">Alterar</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Fotografias <span style="color:#66625A;font-weight:500">(opcional)</span></div>
+            <div style="display:flex;gap:8px">
+              <div style="width:64px;height:64px;border-radius:12px;background:repeating-linear-gradient(135deg,#E8E4DB 0 5px,#F1EEE7 5px 10px)"></div>
+              <div style="width:64px;height:64px;border-radius:12px;border:1.5px dashed #B9B4AA;display:flex;align-items:center;justify-content:center;font-size:22px;color:#66625A">+</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Enviar pedido</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">08 · Meus pedidos</div>
+      <div data-screen-label="08 Meus Pedidos" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 12px;display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:26px;font-weight:800;letter-spacing:-0.02em">Meus pedidos</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;background:#EEEBE4;border-radius:12px;padding:4px;gap:4px">
+            <div style="height:38px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 1px 2px rgba(0,0,0,.06)">Activos (3)</div>
+            <div style="height:38px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#66625A">Histórico</div>
+          </div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ orders }}" as="o" hint-placeholder-count="5">
+            <div style="padding:14px;border-radius:16px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;font-weight:800;padding:4px 10px;border-radius:10px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.status }}</span>
+                <span style="font-size:12.5px;color:#66625A">{{ o.date }}</span>
+              </div>
+              <div style="font-size:15px;font-weight:800">{{ o.service }}</div>
+              <div style="font-size:13px;color:#66625A">{{ o.who }} · {{ o.price }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">09 · Avaliação</div>
+      <div data-screen-label="09 Avaliacao" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 24px 20px;display:flex;flex-direction:column;gap:20px;flex:1">
+          <div style="display:flex;justify-content:flex-end"><div style="font-size:14px;font-weight:700;color:#66625A">Agora não</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+            <div style="width:76px;height:76px;border-radius:22px;background:repeating-linear-gradient(135deg,#CFCAC0 0 5px,#DCD8CE 5px 10px)"></div>
+            <div style="font-size:22px;font-weight:800;letter-spacing:-0.01em;text-wrap:pretty">Como foi o serviço do Carlos?</div>
+            <div style="font-size:14px;color:#66625A">Reparação eléctrica · concluído hoje</div>
+          </div>
+          <div style="display:flex;justify-content:center;gap:8px">
+            <sc-for list="{{ stars }}" as="st" hint-placeholder-count="5">
+              <div style="width:48px;height:48px;border-radius:12px;background:{{ st.bg }};color:{{ st.fg }};display:flex;align-items:center;justify-content:center;font-size:26px">★</div>
+            </sc-for>
+          </div>
+          <div style="text-align:center;font-size:14px;font-weight:700;margin-top:-8px">Muito bom</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700">Comentário</div>
+            <div style="height:96px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;padding:12px 14px;font-size:14px;line-height:1.45">Chegou a horas e explicou tudo antes de começar.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:13px;font-weight:700">Recomendaria a um amigo?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="height:48px;border-radius:12px;border:1.5px solid #1F7A4D;background:#E3F0E8;color:#16583A;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px">Sim</div>
+              <div style="height:48px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px">Não</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Enviar avaliação</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section data-screen-label="Prestador" style="padding:40px 64px 80px">
+  <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:32px;flex-wrap:wrap">
+    <div style="font-size:40px;font-weight:800;letter-spacing:-0.02em">Prestador</div>
+    <div style="font-size:18px;color:#66625A">Módulo do prestador · telas 10–15</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">10 · Painel</div>
+      <div data-screen-label="10 Painel" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="background:#16583A;color:#fff;padding:0 20px 20px;display:flex;flex-direction:column;gap:16px">
+          <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 4px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:13px;color:#C9E0D2">Bom dia,</div><div style="font-size:22px;font-weight:800">Carlos</div></div>
+            <div style="font-size:12px;font-weight:800;padding:6px 10px;border-radius:12px;background:#fff;color:#16583A">Premium</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="font-size:13px;color:#C9E0D2">Ganhos este mês</div>
+            <div style="font-size:34px;font-weight:800;letter-spacing:-0.02em">18 400 MT</div>
+            <div style="font-size:13px;color:#C9E0D2">+22% face a Agosto</div>
+          </div>
+        </div>
+        <div style="padding:16px 20px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="padding:14px;border-radius:16px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:22px;font-weight:800">{{ k.v }}</div>
+              <div style="font-size:12.5px;color:#66625A">{{ k.l }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:18px 20px 0;display:flex;flex-direction:column;gap:10px;flex:1;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:800">Novos pedidos</div><div style="font-size:13px;color:#1F7A4D;font-weight:700">Ver todos</div></div>
+          <div style="padding:14px;border-radius:16px;background:#fff;border:1.5px solid #1F7A4D;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#66625A"><span>Há 12 min · Matola, Liberdade</span></div>
+            <div style="font-size:15px;font-weight:800">Instalação de iluminação</div>
+            <div style="font-size:13px;color:#66625A">Joana M. · Sáb, 4 Out</div>
+          </div>
+        </div>
+        <div style="height:70px;border-top:1px solid #E4E0D7;background:#fff;display:grid;grid-template-columns:repeat(4,1fr)">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#1F7A4D"><div style="width:20px;height:20px;border-radius:6px;background:#1F7A4D"></div>Painel</div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#8B877E"><div style="width:20px;height:20px;border-radius:6px;border:2px solid #8B877E"></div>Pedidos</div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#8B877E"><div style="width:20px;height:20px;border-radius:6px;border:2px solid #8B877E"></div>Serviços</div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:700;color:#8B877E"><div style="width:20px;height:20px;border-radius:50%;border:2px solid #8B877E"></div>Perfil</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">11 · Perfil profissional</div>
+      <div data-screen-label="11 Perfil Profissional" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+            <div style="font-size:17px;font-weight:800">Editar perfil</div>
+            <div style="font-size:14px;font-weight:700;color:#1F7A4D">Guardar</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:72px;height:72px;border-radius:20px;background:repeating-linear-gradient(135deg,#CFCAC0 0 5px,#DCD8CE 5px 10px)"></div>
+            <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:14px;font-weight:700;color:#1F7A4D">Alterar fotografia</div><div style="font-size:12.5px;color:#66625A">Rosto visível aumenta a confiança</div></div>
+          </div>
+          <div style="padding:12px 14px;border-radius:14px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;font-size:13px"><b>Perfil 80% completo</b><span style="color:#66625A">Falta: 2 fotos</span></div>
+            <div style="height:6px;border-radius:3px;background:#EEEBE4"><div style="width:80%;height:6px;border-radius:3px;background:#1F7A4D"></div></div>
+          </div>
+          <sc-for list="{{ proFields }}" as="f" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;font-weight:700">{{ f.label }}</div>
+              <div style="min-height:46px;border-radius:12px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;padding:10px 14px;font-size:14px;line-height:1.4">{{ f.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">12 · Portfólio</div>
+      <div data-screen-label="12 Portfolio" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+            <div style="font-size:18px;font-weight:800">Portfólio</div>
+          </div>
+          <div style="padding:12px 14px;border-radius:14px;background:#E3F0E8;color:#16583A;font-size:13px;line-height:1.4">Perfis com 6 ou mais fotos recebem mais pedidos. Mostre o antes e depois.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;background:#EEEBE4;border-radius:12px;padding:4px;gap:4px">
+            <div style="height:38px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 1px 2px rgba(0,0,0,.06)">Fotos (7)</div>
+            <div style="height:38px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#66625A">Vídeos (1)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="aspect-ratio:1;border-radius:14px;border:1.5px dashed #B9B4AA;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#66625A"><span style="font-size:26px">+</span><span style="font-size:13px;font-weight:700">Adicionar</span></div>
+            <sc-for list="{{ portfolio }}" as="ph" hint-placeholder-count="5">
+              <div style="aspect-ratio:1;border-radius:14px;background:repeating-linear-gradient(135deg,#E8E4DB 0 6px,#F1EEE7 6px 12px);display:flex;flex-direction:column;justify-content:flex-end;padding:8px;gap:2px">
+                <span style="font-size:12.5px;font-weight:800">{{ ph.t }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#66625A">{{ ph.d }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">13 · Serviços e preços</div>
+      <div data-screen-label="13 Precos" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+            <div style="font-size:18px;font-weight:800">Serviços e preços</div>
+          </div>
+          <div style="font-size:14px;color:#66625A;line-height:1.45">Preços visíveis ajudam o cliente a decidir. Indique o valor inicial de cada serviço.</div>
+          <sc-for list="{{ proPrices }}" as="pp" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#fff;border:1px solid #E4E0D7">
+              <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:800">{{ pp.name }}</span><span style="font-size:12.5px;color:#66625A">{{ pp.unit }}</span></div>
+              <div style="height:40px;min-width:96px;border-radius:10px;border:1px solid #E4E0D7;background:#FAF9F6;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;font-size:15px;font-weight:800">{{ pp.price }}</div>
+            </div>
+          </sc-for>
+          <div style="height:50px;border-radius:14px;border:1.5px dashed #B9B4AA;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#1F7A4D">+ Adicionar serviço</div>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Guardar preços</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">14 · Gestão de pedidos</div>
+      <div data-screen-label="14 Gestao Pedidos" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 12px;display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:26px;font-weight:800;letter-spacing:-0.02em">Pedidos</div>
+          <div style="display:flex;gap:8px">
+            <div style="height:34px;padding:0 14px;border-radius:17px;background:#1C1B18;color:#fff;display:flex;align-items:center;font-size:13px;font-weight:700">Novos (2)</div>
+            <div style="height:34px;padding:0 14px;border-radius:17px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;font-size:13px;font-weight:700">Aceites</div>
+            <div style="height:34px;padding:0 14px;border-radius:17px;border:1px solid #E4E0D7;background:#fff;display:flex;align-items:center;font-size:13px;font-weight:700">Concluídos</div>
+          </div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ incoming }}" as="in" hint-placeholder-count="2">
+            <div style="padding:14px;border-radius:16px;background:#fff;border:1px solid #E4E0D7;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#66625A"><span>{{ in.ago }}</span><span>{{ in.area }}</span></div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="font-size:16px;font-weight:800">{{ in.service }}</div>
+                <div style="font-size:13.5px;line-height:1.45;color:#3A3833">{{ in.desc }}</div>
+              </div>
+              <div style="display:flex;gap:8px;font-size:12.5px">
+                <span style="padding:5px 10px;border-radius:9px;background:#EEEBE4;font-weight:700">{{ in.date }}</span>
+                <span style="padding:5px 10px;border-radius:9px;background:#EEEBE4;font-weight:700">{{ in.client }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:8px">
+                <div style="height:46px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#A33A2A">✕ Rejeitar</div>
+                <div style="height:46px;border-radius:12px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">✓ Aceitar</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#66625A">15 · Assinatura</div>
+      <div data-screen-label="15 Assinatura" style="width:360px;height:760px;border-radius:36px;overflow:hidden;background:#FAF9F6;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(28,27,24,.14)">
+        <div style="height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:13px;font-weight:600"><span>9:41</span><span>▮▮▮</span></div>
+        <div style="padding:6px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="width:44px;height:44px;border-radius:12px;border:1px solid #E4E0D7;display:flex;align-items:center;justify-content:center;font-size:18px">←</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:26px;font-weight:800;letter-spacing:-0.02em;text-wrap:pretty">Consiga mais clientes</div>
+            <div style="font-size:14px;color:#66625A">Comece com 30 dias grátis. Cancele quando quiser.</div>
+          </div>
+          <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="3">
+            <div style="padding:16px;border-radius:16px;background:#fff;border:{{ pl.border }};display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <div style="font-size:16px;font-weight:800">{{ pl.name }}</div>
+                <div><span style="font-size:22px;font-weight:800">{{ pl.price }}</span><span style="font-size:12.5px;color:#66625A">{{ pl.per }}</span></div>
+              </div>
+              <div style="font-size:13px;line-height:1.5;color:#3A3833">{{ pl.desc }}</div>
+            </div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div style="height:54px;border-radius:14px;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Começar teste grátis</div>
+          <div style="text-align:center;font-size:12.5px;color:#66625A">Pagamento via M-Pesa e e-Mola em breve</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const on = { bg: '#1F7A4D', color: '#fff', border: '#1F7A4D' };
+    const off = { bg: '#fff', color: '#1C1B18', border: '#E4E0D7' };
+    const st = (s) => ({
+      'Pendente': { bg: '#F6ECD6', fg: '#7A5410' },
+      'Aceite': { bg: '#E3F0E8', fg: '#16583A' },
+      'Em execução': { bg: '#E1EAF6', fg: '#1F4E86' },
+      'Concluído': { bg: '#EEEBE4', fg: '#3A3833' },
+      'Cancelado': { bg: '#F6E3DF', fg: '#8E2F22' }
+    })[s];
+    const orders = [
+      ['Em execução', 'Hoje', 'Reparação eléctrica', 'Carlos Mabunda', '300 MT'],
+      ['Aceite', 'Qui, 2 Out', 'Desentupimento', 'Hélio Cossa', '450 MT'],
+      ['Pendente', 'Sáb, 4 Out', 'Pintura de quarto', 'Lurdes Macuácua', '1 000 MT'],
+      ['Concluído', '21 Set', 'Formatação de portátil', 'Nelson Tembe', '600 MT'],
+      ['Cancelado', '15 Set', 'Limpeza geral', 'Célia Nhantumbo', '800 MT']
+    ].map(([status, date, service, who, price]) => ({ status, date, service, who, price, ...st(status) }));
+    return {
+      signupFields: [
+        { label: 'Nome completo', value: 'Ana Sitoe' },
+        { label: 'Telefone', value: '+258 84 123 4567' },
+        { label: 'Email', value: 'ana.sitoe@gmail.com' },
+        { label: 'Palavra-passe', value: '••••••••' }
+      ],
+      suggestions: ['Canalizador', 'Electricista', 'Pedreiro', 'Pintor', 'Mecânico'],
+      categories: [
+        { abbr: 'Co', name: 'Construção' }, { abbr: 'El', name: 'Electricidade' },
+        { abbr: 'Ca', name: 'Canalização' }, { abbr: 'Me', name: 'Mecânica' },
+        { abbr: 'Li', name: 'Limpeza' }, { abbr: 'In', name: 'Informática' },
+        { abbr: 'Be', name: 'Beleza' }, { abbr: 'Tr', name: 'Transporte' }
+      ],
+      featured: [
+        { name: 'Carlos Mabunda', job: 'Electricista', area: 'Matola', rating: '4.8', price: '500 MT' },
+        { name: 'Hélio Cossa', job: 'Canalizador', area: 'Maxaquene', rating: '4.9', price: '400 MT' }
+      ],
+      filters: [
+        { label: 'Matola ▾', ...on }, { label: 'Bairro ▾', ...off },
+        { label: 'Até 1 000 MT', ...off }, { label: '4★ ou mais', ...on }, { label: '✓ Verificado', ...on }
+      ],
+      results: [
+        { name: 'Carlos Mabunda', area: 'Fomento', jobs: 148, rating: '4.8', reviews: 62, price: '500 MT' },
+        { name: 'Fernando Chissano', area: 'Machava', jobs: 93, rating: '4.7', reviews: 41, price: '400 MT' },
+        { name: 'Isac Langa', area: 'Liberdade', jobs: 57, rating: '4.6', reviews: 28, price: '350 MT' },
+        { name: 'Dércio Mondlane', area: 'Tsalala', jobs: 34, rating: '4.5', reviews: 19, price: '300 MT' },
+        { name: 'Paulo Manhiça', area: 'Matola-Rio', jobs: 21, rating: '4.4', reviews: 11, price: '300 MT' }
+      ],
+      portfolio3: ['quadro eléctrico', 'iluminação', 'tomadas'],
+      prices: [
+        { name: 'Instalação eléctrica', price: '500 MT' },
+        { name: 'Reparação', price: '300 MT' },
+        { name: 'Montagem de candeeiro', price: '250 MT' }
+      ],
+      reviews: [
+        { who: 'Marta S.', when: 'há 3 dias', text: '“Excelente profissional. Resolveu o problema do quadro no mesmo dia.”' },
+        { who: 'João B.', when: 'há 2 semanas', text: '“Muito pontual e o preço foi o combinado.”' }
+      ],
+      orders,
+      stars: [1, 2, 3, 4, 5].map(i => i <= 4 ? { bg: '#F6ECD6', fg: '#C98A1A' } : { bg: '#EEEBE4', fg: '#B9B4AA' }),
+      kpis: [
+        { v: '5', l: 'Pedidos recebidos' }, { v: '148', l: 'Serviços realizados' },
+        { v: '4.8 ★', l: 'Avaliação média' }, { v: '112', l: 'Clientes' }
+      ],
+      proFields: [
+        { label: 'Profissão', value: 'Electricista' },
+        { label: 'Descrição', value: 'Instalações e reparações eléctricas residenciais e comerciais. Garantia de 30 dias.' },
+        { label: 'Experiência', value: '8 anos' },
+        { label: 'Bairro de actuação', value: 'Matola · Fomento, Machava, Liberdade' },
+        { label: 'Contactos', value: '+258 84 555 0192 · WhatsApp' }
+      ],
+      portfolio: [
+        { t: 'Quadro eléctrico', d: 'antes / depois' }, { t: 'Iluminação LED', d: 'sala · Fomento' },
+        { t: 'Tomadas cozinha', d: 'Machava' }, { t: 'Loja comercial', d: 'vídeo 0:42' },
+        { t: 'Portão eléctrico', d: 'Liberdade' }
+      ],
+      proPrices: [
+        { name: 'Instalação eléctrica', unit: 'por ponto', price: '500 MT' },
+        { name: 'Reparação', unit: 'por visita', price: '300 MT' },
+        { name: 'Pintura', unit: 'por divisão', price: '1 000 MT' },
+        { name: 'Quadro eléctrico', unit: 'montagem', price: '2 500 MT' }
+      ],
+      incoming: [
+        { ago: 'Há 12 min', area: 'Matola, Liberdade', service: 'Instalação de iluminação', desc: 'Preciso de instalar 6 luzes LED na sala e no corredor.', date: 'Sáb, 4 Out · Manhã', client: 'Joana M. ★ 4.9' },
+        { ago: 'Há 1 h', area: 'Matola, Fomento', service: 'Reparação', desc: 'O disjuntor dispara sempre que ligo o ferro.', date: 'Amanhã · Tarde', client: 'Rui T. ★ 4.7' }
+      ],
+      tenders: [
+        { area: 'Polana Caniço A', dist: '3 km', left: '18 h', title: 'Substituir canos da casa de banho', budget: '1 500 MT', count: 3 },
+        { area: 'Maxaquene B', dist: '5 km', left: '2 dias', title: 'Instalar autoclismo novo', budget: '800 MT', count: 1 },
+        { area: 'Hulene', dist: '8 km', left: '6 h', title: 'Reparar fuga no tanque de água', budget: '1 200 MT', count: 5 },
+        { area: 'Malhangalene', dist: '9 km', left: '1 dia', title: 'Canalização completa de cozinha nova', budget: '6 000 MT', count: 2 }
+      ],
+      proposals: [
+        { name: 'Hélio Cossa', rating: '4.9', jobs: 211, price: '1 500 MT', kind: 'Aceita', bg: '#E3F0E8', fg: '#16583A', why: '“Posso ir amanhã de manhã. Material incluído.”' },
+        { name: 'Fernando Chissano', rating: '4.7', jobs: 93, price: '1 800 MT', kind: 'Contraproposta', bg: '#F6ECD6', fg: '#7A5410', why: '“O orçamento não cobre o material: 2 sifões e tubo PVC novo custam cerca de 300 MT.”' },
+        { name: 'Isac Langa', rating: '4.6', jobs: 57, price: '1 300 MT', kind: 'Contraproposta', bg: '#F6ECD6', fg: '#7A5410', why: '“Faço por menos se puder ser na sexta-feira.”' }
+      ],
+      plans: [
+        { name: 'Teste gratuito', price: '0 MT', per: ' / 30 dias', desc: 'Perfil visível, até 5 pedidos por mês.', border: '1px solid #E4E0D7' },
+        { name: 'Básico', price: '100 MT', per: ' / mês', desc: 'Pedidos ilimitados, portfólio até 10 fotos, selo verificado.', border: '1px solid #E4E0D7' },
+        { name: 'Premium', price: '200 MT', per: ' / mês', desc: 'Tudo do Básico, destaque na pesquisa e na página inicial, estatísticas.', border: '2px solid #1F7A4D' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
