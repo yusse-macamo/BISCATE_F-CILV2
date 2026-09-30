@@ -326,39 +326,6 @@ class _Perfil extends ConsumerWidget {
                       bio,
                       style: estiloTexto(14, c: CoresApp.corpo, h: 1.55),
                     ),
-                  _cabecalho('Trabalhos realizados'),
-                  VistaLista<ItemPortfolioModelo>(
-                    valor: ref.watch(portfolioPrestadorProvider(p.perfilId)),
-                    aoRepetir: () =>
-                        ref.invalidate(portfolioPrestadorProvider(p.perfilId)),
-                    mensagemVazia: 'Ainda não publicou trabalhos.',
-                    construir: (itens) => GrelhaUniforme(
-                      colunas: 3,
-                      espacoH: 8,
-                      children: [
-                        for (final item in itens.take(6))
-                          AspectRatio(
-                            aspectRatio: 1,
-                            // Os vídeos não se reproduzem aqui: mostra-se a
-                            // legenda sobre o padrão do design.
-                            child: item.tipo == TipoMedia.video
-                                ? Riscado(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(6),
-                                      child: Align(
-                                        alignment: Alignment.bottomLeft,
-                                        child: Text(
-                                          item.legenda ?? 'vídeo',
-                                          style: mono(9.5),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : FotoPrestador(url: item.url, raio: 12),
-                          ),
-                      ],
-                    ),
-                  ),
                   _cabecalho('Preços'),
                   Container(
                     decoration: BoxDecoration(
@@ -389,6 +356,27 @@ class _Perfil extends ConsumerWidget {
                             style: estiloTexto(12, c: CoresApp.atenuado),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  _cabecalho('Galeria de trabalhos'),
+                  VistaLista<FotoPortfolioModelo>(
+                    valor: ref.watch(portfolioPrestadorProvider(p.perfilId)),
+                    aoRepetir: () =>
+                        ref.invalidate(portfolioPrestadorProvider(p.perfilId)),
+                    mensagemVazia: 'Ainda não publicou trabalhos.',
+                    construir: (fotos) => GrelhaUniforme(
+                      colunas: 3,
+                      espacoH: 8,
+                      children: [
+                        for (final foto in fotos)
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: Toque(
+                              aoTocar: () => _verFoto(context, foto),
+                              child: FotoPrestador(url: foto.url, raio: 12),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -449,6 +437,42 @@ class _Perfil extends ConsumerWidget {
       ),
     ),
   );
+
+  /// A fotografia em grande, com a legenda.
+  void _verFoto(BuildContext context, FotoPortfolioModelo foto) =>
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => Dialog(
+          backgroundColor: CoresApp.pagina,
+          insetPadding: const EdgeInsets.all(16),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AspectRatio(
+                aspectRatio: 1,
+                child: FotoPrestador(url: foto.url, raio: 0),
+              ),
+              if (foto.legenda case final legenda? when legenda.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Text(legenda, style: estiloTexto(14, w: w700, h: 1.4)),
+                ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(
+                    'Fechar',
+                    style: estiloTexto(14, w: w700, c: CoresApp.verde),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 
   Widget _cabecalho(String t) => Padding(
     padding: const EdgeInsets.only(top: 6),

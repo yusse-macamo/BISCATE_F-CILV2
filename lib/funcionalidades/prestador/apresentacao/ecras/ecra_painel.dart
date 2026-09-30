@@ -12,7 +12,9 @@ import '../../dados/modelos/painel_prestador_modelo.dart';
 import '../../../pedidos/apresentacao/controladores/pedidos_controlador.dart';
 import '../../../pedidos/dados/modelos/pedido_modelo.dart';
 import '../controladores/painel_controlador.dart';
+import '../controladores/portfolio_controlador.dart';
 import 'ecra_assinatura.dart';
+import 'ecra_portfolio.dart';
 import 'ecra_principal_prestador.dart';
 
 /// 10 · Painel
@@ -216,6 +218,7 @@ class EcraPainel extends ConsumerWidget {
                     ],
                   ),
                 ),
+                const _CartaoGaleria(),
                 Center(
                   child: TextButton(
                     onPressed: () =>
@@ -304,6 +307,43 @@ class _ProximoPedido extends ConsumerWidget {
             return _CartaoNovo(novo, aoTocar: abrirPedidos);
           },
         );
+  }
+}
+
+/// Entrada para a galeria de trabalhos, com quantas fotografias tem.
+class _CartaoGaleria extends ConsumerWidget {
+  const _CartaoGaleria();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final resumo = ref
+        .watch(meuPortfolioProvider)
+        .when(
+          loading: () => 'A carregar…',
+          error: (_, _) => 'Mostre aos clientes o seu trabalho',
+          data: (fotos) => fotos.isEmpty
+              ? 'Ainda sem fotografias · acrescente as primeiras'
+              : '${fotos.length} de ${GaleriaControlador.limiteFotos} '
+                    'fotografias',
+        );
+    return Cartao(
+      aoTocar: () => navegarPara(context, const EcraPortfolio()),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Galeria de trabalhos', style: estiloTexto(15, w: w800)),
+                const SizedBox(height: 4),
+                Text(resumo, style: estiloTexto(13, c: CoresApp.atenuado)),
+              ],
+            ),
+          ),
+          Text('›', style: estiloTexto(20, c: CoresApp.atenuado)),
+        ],
+      ),
+    );
   }
 }
 

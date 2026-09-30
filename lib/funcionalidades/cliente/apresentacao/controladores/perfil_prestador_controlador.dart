@@ -55,9 +55,9 @@ class FavoritoControlador extends AutoDisposeFamilyAsyncNotifier<bool, String> {
   }
 }
 
-/// Trabalhos publicados pelo prestador (`portfolio`).
+/// Galeria de trabalhos do prestador (fotografias de `portfolio`).
 final portfolioPrestadorProvider = FutureProvider.autoDispose
-    .family<List<ItemPortfolioModelo>, String>(
+    .family<List<FotoPortfolioModelo>, String>(
       (ref, prestadorId) =>
           ref.watch(portfolioRepositorioProvider).listar(prestadorId),
     );

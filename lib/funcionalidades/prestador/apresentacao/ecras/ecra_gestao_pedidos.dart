@@ -7,6 +7,8 @@ import '../../../../nucleo/tema/tema_app.dart';
 import '../../../../nucleo/utilitarios/formatacao_mt.dart';
 import '../../../pedidos/apresentacao/controladores/pedidos_controlador.dart';
 import '../../../pedidos/dados/modelos/pedido_modelo.dart';
+import '../../../trabalhos/apresentacao/controladores/trabalhos_controlador.dart';
+import '../../../trabalhos/dados/modelos/trabalho_modelo.dart';
 
 /// 14 · Gestão de pedidos
 ///
@@ -64,6 +66,72 @@ class _EstadoEcraGestaoPedidos extends ConsumerState<EcraGestaoPedidos> {
     mostrarAviso(context, erro ?? 'Pedido rejeitado.');
   }
 
+  Future<void> _actualizar() async {
+    ref
+      ..invalidate(pedidosPrestadorProvider)
+      ..invalidate(trabalhosConcursoPrestadorProvider);
+    await Future.wait([
+      ref.read(pedidosPrestadorProvider.future),
+      ref.read(trabalhosConcursoPrestadorProvider.future),
+    ]);
+  }
+
+  /// "Novos" são só pedidos pendentes (os concursos chegam pelas
+  /// Oportunidades). "Aceites" e "Concluídos" juntam os trabalhos que vieram
+  /// de pedidos com os que vieram de concursos adjudicados.
+  Widget _lista(
+    AsyncValue<List<PedidoModelo>> pedidos,
+    Set<String> aResponder,
+  ) {
+    final concursos = _separador == _Separador.novos
+        ? const AsyncData(<TrabalhoModelo>[])
+        : ref.watch(trabalhosConcursoPrestadorProvider);
+    final erro = pedidos.error ?? concursos.error;
+    if (erro != null) {
+      return EstadoErro(mensagem: mensagemDe(erro), aoRepetir: _actualizar);
+    }
+    if (!pedidos.hasValue || !concursos.hasValue) {
+      return const EstadoCarregar();
+    }
+
+    final doPedido = _do(pedidos.requireValue, _separador);
+    final deConcurso = [
+      for (final t in concursos.requireValue)
+        if (_separador == _Separador.aceites ? t.emCurso : t.concluido) t,
+    ];
+    final cartoes = <(DateTime?, Widget)>[
+      for (final p in doPedido)
+        (
+          p.criadoEm,
+          _CartaoPedidoRecebido(
+            p,
+            accoes: _separador == _Separador.novos,
+            aResponder: aResponder.contains(p.id),
+            aoRejeitar: () => _rejeitar(p),
+            aoAceitar: () => _aceitar(p),
+          ),
+        ),
+      for (final t in deConcurso) (t.criadoEm, _CartaoTrabalhoConcurso(t)),
+    ]..sort((a, b) => (b.$1 ?? DateTime(0)).compareTo(a.$1 ?? DateTime(0)));
+
+    if (cartoes.isEmpty) {
+      return EstadoVazio(switch (_separador) {
+        _Separador.novos => 'Sem pedidos novos de momento.',
+        _Separador.aceites => 'Não tem trabalhos em curso.',
+        _Separador.concluidos => 'Ainda não concluiu trabalhos.',
+      });
+    }
+    return RefreshIndicator(
+      onRefresh: _actualizar,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        itemCount: cartoes.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
+        itemBuilder: (context, i) => cartoes[i].$2,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pedidos = ref.watch(pedidosPrestadorProvider);
@@ -106,41 +174,80 @@ class _EstadoEcraGestaoPedidos extends ConsumerState<EcraGestaoPedidos> {
               ],
             ),
           ),
-          Expanded(
-            child: pedidos.when(
-              loading: () => const EstadoCarregar(),
-              error: (erro, _) => EstadoErro(
-                mensagem: mensagemDe(erro),
-                aoRepetir: () => ref.invalidate(pedidosPrestadorProvider),
-              ),
-              data: (todos) {
-                final lista = _do(todos, _separador);
-                if (lista.isEmpty) {
-                  return EstadoVazio(switch (_separador) {
-                    _Separador.novos => 'Sem pedidos novos de momento.',
-                    _Separador.aceites => 'Não tem trabalhos em curso.',
-                    _Separador.concluidos => 'Ainda não concluiu trabalhos.',
-                  });
-                }
-                return RefreshIndicator(
-                  onRefresh: () => ref.refresh(pedidosPrestadorProvider.future),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                    itemCount: lista.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, i) => _CartaoPedidoRecebido(
-                      lista[i],
-                      accoes: _separador == _Separador.novos,
-                      aResponder: aResponder.contains(lista[i].id),
-                      aoRejeitar: () => _rejeitar(lista[i]),
-                      aoAceitar: () => _aceitar(lista[i]),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          Expanded(child: _lista(pedidos, aResponder)),
         ],
+      ),
+    );
+  }
+}
+
+/// Trabalho que veio de um concurso adjudicado. O cliente já escolheu esta
+/// proposta, por isso o contacto é legível; concluir é do cliente.
+class _CartaoTrabalhoConcurso extends StatelessWidget {
+  const _CartaoTrabalhoConcurso(this.trabalho);
+
+  final TrabalhoModelo trabalho;
+
+  @override
+  Widget build(BuildContext context) {
+    final cliente = trabalho.cliente;
+    return Cartao(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: comEspaco([
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Selo(
+                'Concurso',
+                fundo: CoresApp.azulFundo,
+                frente: CoresApp.azulFrente,
+              ),
+              if (trabalho.zona case final zona?)
+                Text(zona, style: estiloTexto(12.5, c: CoresApp.atenuado)),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(trabalho.servico, style: estiloTexto(16, w: w800)),
+              if (trabalho.descricao case final d? when d.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(d, style: estiloTexto(13.5, c: CoresApp.corpo, h: 1.45)),
+              ],
+            ],
+          ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              Etiqueta(textoValor(trabalho.valorAcordado), margemH: 10),
+              if (trabalho.concluido) const Etiqueta('Concluído', margemH: 10),
+            ],
+          ),
+          if (cliente == null)
+            Text(
+              'Contacto do cliente indisponível.',
+              style: estiloTexto(12.5, c: CoresApp.atenuado, h: 1.4),
+            )
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(cliente.nome, style: estiloTexto(14, w: w700)),
+                if (cliente.telefone case final telefone?)
+                  Text(
+                    '+258 $telefone',
+                    style: estiloTexto(13.5, w: w600, c: CoresApp.verde),
+                  ),
+                if (trabalho.endereco case final endereco?)
+                  Text(
+                    endereco,
+                    style: estiloTexto(12.5, c: CoresApp.atenuado, h: 1.4),
+                  ),
+              ],
+            ),
+        ], 10),
       ),
     );
   }
