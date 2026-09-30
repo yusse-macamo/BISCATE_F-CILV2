@@ -113,17 +113,17 @@ class SolicitacaoControlador
 
   /// Propõe a zona do perfil do cliente; ele pode mudar.
   Future<void> _preencherZonaDoCliente() async {
-    final clienteId = _clienteId;
-    if (clienteId == null) return;
     try {
+      final clienteId = _clienteId;
+      if (clienteId == null) return;
       final zonaId = await ref
           .read(procuraRepositorioProvider)
           .zonaDoCliente(clienteId);
       if (!_descartado && zonaId != null && state.zonaId == null) {
         state = state.copiarCom(zonaId: zonaId);
       }
-    } on FalhaApp {
-      // Sem zona proposta, o cliente escolhe; não é motivo para erro.
+    } catch (_) {
+      // É só uma proposta: se falhar, seja porquê for, o cliente escolhe.
     }
   }
 

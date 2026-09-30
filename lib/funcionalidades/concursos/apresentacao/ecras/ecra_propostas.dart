@@ -1,36 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../comum/dados/dados_exemplo.dart';
 import '../../../../comum/widgets/componentes.dart';
+import '../../../../nucleo/dados/cliente_supabase.dart';
+import '../../../../nucleo/dados/excepcoes.dart';
+import '../../../../nucleo/dados/fotos_perfil.dart';
+import '../../../../nucleo/navegacao/navegacao.dart';
 import '../../../../nucleo/tema/tema_app.dart';
-import '../../../../nucleo/utilitarios/formatacao_mt.dart';
+import '../../../cliente/apresentacao/ecras/ecra_perfil_prestador.dart';
+import '../../../cliente/apresentacao/widgets/foto_prestador.dart';
+import '../../dados/modelos/concurso_modelo.dart';
+import '../controladores/concursos_controlador.dart';
 import 'ecra_prestador_escolhido.dart';
 
 /// 19 · Cliente · Escolher prestador
-class EcraPropostas extends StatefulWidget {
-  const EcraPropostas({
-    super.key,
-    this.titulo = 'Substituir canos da casa de banho',
-    this.orcamento = '1 500 MT',
-  });
+///
+/// Lê as propostas do concurso. Escolher chama `adjudicar_concurso`, que
+/// fecha as outras e cria o trabalho numa só transacção no servidor.
+class EcraPropostas extends ConsumerStatefulWidget {
+  const EcraPropostas({super.key, required this.concursoId});
 
-  final String titulo;
-  final String orcamento;
+  final String concursoId;
 
   @override
-  State<EcraPropostas> createState() => _EstadoEcraPropostas();
+  ConsumerState<EcraPropostas> createState() => _EstadoEcraPropostas();
 }
 
-class _EstadoEcraPropostas extends State<EcraPropostas> {
+class _EstadoEcraPropostas extends ConsumerState<EcraPropostas> {
   String _ordenacao = 'Melhor avaliados';
+
+  List<PropostaModelo> _ordenar(List<PropostaModelo> propostas) {
+    final lista = [...propostas];
+    if (_ordenacao == 'Melhor avaliados') {
+      lista.sort(
+        (a, b) => (b.avaliacaoMedia ?? 0).compareTo(a.avaliacaoMedia ?? 0),
+      );
+    } else {
+      lista.sort((a, b) => a.valor.compareTo(b.valor));
+    }
+    return lista;
+  }
+
+  Future<void> _escolher(ConcursoModelo concurso, PropostaModelo p) async {
+    final confirmado = await escolherOpcao(
+      context,
+      ['Escolher ${p.nome}', 'Cancelar'],
+      '',
+      titulo: 'Os outros prestadores são avisados de que o concurso fechou.',
+    );
+    if (confirmado != 'Escolher ${p.nome}' || !mounted) return;
+    final erro = await ref
+        .read(adjudicacaoControladorProvider.notifier)
+        .escolher(concurso.id, p.id);
+    if (!mounted) return;
+    if (erro != null) return mostrarAviso(context, erro);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => EcraPrestadorEscolhido(
+          nome: p.nome,
+          servico: concurso.servico ?? concurso.titulo,
+          preco: textoOrcamento(p.valor),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final lista = [...DadosExemplo.propostas];
-    if (_ordenacao == 'Melhor avaliados')
-      lista.sort((a, b) => b.avaliacao.compareTo(a.avaliacao));
-    if (_ordenacao == 'Mais baratos')
-      lista.sort((a, b) => lerMt(a.preco).compareTo(lerMt(b.preco)));
+    final concurso = ref.watch(concursoProvider(widget.concursoId));
+    final propostas = ref.watch(propostasProvider(widget.concursoId));
+    final aEscolher = ref.watch(adjudicacaoControladorProvider);
+    final c = concurso.valueOrNull;
+
     return EcraBase(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,18 +85,27 @@ class _EstadoEcraPropostas extends State<EcraPropostas> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 LinhaTitulo(
-                  titulo: widget.titulo,
-                  subtitulo: 'Orçamento ${widget.orcamento} · fecha em 18 h',
+                  titulo: c?.titulo ?? 'Propostas',
+                  subtitulo: c == null
+                      ? null
+                      : [
+                          'Orçamento ${textoOrcamento(c.orcamento)}',
+                          if (c.estado == EstadoConcurso.aberto)
+                            textoFecho(c.fechaEm, DateTime.now()).toLowerCase()
+                          else
+                            c.estado.rotulo.toLowerCase(),
+                        ].join(' · '),
                   tamanhoTitulo: 16,
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        '${lista.length} propostas',
-                        style: estiloTexto(13, w: w700),
-                      ),
+                      child: Text(switch (propostas.valueOrNull?.length) {
+                        null => 'Propostas',
+                        1 => '1 proposta',
+                        final n => '$n propostas',
+                      }, style: estiloTexto(13, w: w700)),
                     ),
                     GestureDetector(
                       onTap: () async {
@@ -78,13 +128,45 @@ class _EstadoEcraPropostas extends State<EcraPropostas> {
             ),
           ),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              itemCount: lista.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (context, i) =>
-                  _CartaoProposta(lista[i], servico: widget.titulo),
-            ),
+            child: concurso.hasError
+                ? EstadoErro(
+                    mensagem: mensagemDe(concurso.error!),
+                    aoRepetir: () =>
+                        ref.invalidate(concursoProvider(widget.concursoId)),
+                  )
+                : !concurso.isLoading && c == null
+                ? const EstadoVazio('Este concurso já não está disponível.')
+                : VistaLista<PropostaModelo>(
+                    valor: propostas,
+                    aoRepetir: () =>
+                        ref.invalidate(propostasProvider(widget.concursoId)),
+                    mensagemVazia:
+                        'Ainda não há propostas. Os prestadores da zona foram '
+                        'avisados; volte a ver daqui a pouco.',
+                    construir: (lista) => RefreshIndicator(
+                      onRefresh: () => ref.refresh(
+                        propostasProvider(widget.concursoId).future,
+                      ),
+                      child: ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                        itemCount: lista.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) {
+                          final p = _ordenar(lista)[i];
+                          return _CartaoProposta(
+                            p,
+                            podeEscolher:
+                                c?.estado == EstadoConcurso.aberto &&
+                                aEscolher == null,
+                            aEscolher: aEscolher == p.id,
+                            aoEscolher: c == null
+                                ? null
+                                : () => _escolher(c, p),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -92,14 +174,28 @@ class _EstadoEcraPropostas extends State<EcraPropostas> {
   }
 }
 
-class _CartaoProposta extends StatelessWidget {
-  const _CartaoProposta(this.p, {required this.servico});
+class _CartaoProposta extends ConsumerWidget {
+  const _CartaoProposta(
+    this.p, {
+    required this.podeEscolher,
+    required this.aEscolher,
+    required this.aoEscolher,
+  });
 
-  final Proposta p;
-  final String servico;
+  final PropostaModelo p;
+  final bool podeEscolher;
+  final bool aEscolher;
+  final VoidCallback? aoEscolher;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final (fundo, frente) = p.tipo == TipoProposta.aceitaOrcamento
+        ? (CoresApp.verdeClaro, CoresApp.verdeEscuro)
+        : (CoresApp.ambarFundo, CoresApp.ambarFrente);
+    final foto = urlFotoPerfil(
+      ref.read(clienteSupabaseProvider),
+      p.fotoCaminho,
+    );
     return Cartao(
       preenchimento: const EdgeInsets.all(13),
       child: Column(
@@ -107,7 +203,7 @@ class _CartaoProposta extends StatelessWidget {
         children: comEspaco([
           Row(
             children: [
-              const Riscado(largura: 40, altura: 40, raio: 12),
+              FotoPrestador(url: foto, largura: 40, altura: 40, raio: 12),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -122,19 +218,27 @@ class _CartaoProposta extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 6),
-                        const PontoVerificado(tamanho: 15),
+                        if (p.verificado) ...[
+                          const SizedBox(width: 6),
+                          const PontoVerificado(tamanho: 15),
+                        ],
                       ],
                     ),
                     Text.rich(
                       TextSpan(
                         children: [
+                          if (p.avaliacaoMedia case final m?) ...[
+                            TextSpan(
+                              text: '★',
+                              style: estiloTexto(12, c: CoresApp.estrela),
+                            ),
+                            TextSpan(
+                              text: ' ${m.toStringAsFixed(1)} · ',
+                              style: estiloTexto(12, c: CoresApp.atenuado),
+                            ),
+                          ],
                           TextSpan(
-                            text: '★',
-                            style: estiloTexto(12, c: CoresApp.estrela),
-                          ),
-                          TextSpan(
-                            text: ' ${p.avaliacao} · ${p.servicos} serviços',
+                            text: '${p.servicosFeitos} serviços',
                             style: estiloTexto(12, c: CoresApp.atenuado),
                           ),
                         ],
@@ -146,11 +250,14 @@ class _CartaoProposta extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(p.preco, style: estiloTexto(17, w: w800)),
+                  Text(
+                    textoOrcamento(p.valor),
+                    style: estiloTexto(17, w: w800),
+                  ),
                   Selo(
                     p.tipo.rotulo,
-                    fundo: p.tipo.fundo,
-                    frente: p.tipo.frente,
+                    fundo: fundo,
+                    frente: frente,
                     tamanhoFonte: 11,
                     raio: 8,
                     preenchimento: const EdgeInsets.symmetric(
@@ -162,52 +269,48 @@ class _CartaoProposta extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
-            decoration: BoxDecoration(
-              color: CoresApp.areiaClara,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              p.justificacao,
-              style: estiloTexto(13, c: CoresApp.corpo, h: 1.45),
-            ),
-          ),
-          GrelhaUniforme(
-            colunas: 2,
-            espacoH: 8,
-            flex: const [10, 14],
-            children: [
-              BotaoContorno(
-                'Ver perfil',
-                altura: 40,
-                raio: 11,
-                tamanhoFonte: 13.5,
-                // TODO(passo 8): as propostas de exemplo não têm o id do
-                // prestador; com os concursos ligados, abre
-                // EcraPerfilPrestador(prestadorId: …).
-                aoTocar: () => mostrarAviso(
-                  context,
-                  'O perfil fica disponível quando os concursos estiverem ligados.',
-                ),
+          if (p.justificacao case final j? when j.trim().isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
+              decoration: BoxDecoration(
+                color: CoresApp.areiaClara,
+                borderRadius: BorderRadius.circular(10),
               ),
-              BotaoPrimario(
-                'Escolher',
-                altura: 40,
-                raio: 11,
-                tamanhoFonte: 13.5,
-                aoTocar: () => Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => EcraPrestadorEscolhido(
-                      nome: p.nome,
-                      servico: servico,
-                      preco: p.preco,
-                    ),
+              child: Text(
+                j,
+                style: estiloTexto(13, c: CoresApp.corpo, h: 1.45),
+              ),
+            ),
+          if (p.estado == EstadoProposta.escolhida)
+            Text(
+              'Escolhida',
+              style: estiloTexto(13, w: w700, c: CoresApp.verde),
+            )
+          else
+            GrelhaUniforme(
+              colunas: 2,
+              espacoH: 8,
+              flex: const [10, 14],
+              children: [
+                BotaoContorno(
+                  'Ver perfil',
+                  altura: 40,
+                  raio: 11,
+                  tamanhoFonte: 13.5,
+                  aoTocar: () => navegarPara(
+                    context,
+                    EcraPerfilPrestador(prestadorId: p.prestadorId),
                   ),
                 ),
-              ),
-            ],
-          ),
+                BotaoPrimario(
+                  aEscolher ? 'A escolher…' : 'Escolher',
+                  altura: 40,
+                  raio: 11,
+                  tamanhoFonte: 13.5,
+                  aoTocar: podeEscolher ? aoEscolher : null,
+                ),
+              ],
+            ),
         ], 9),
       ),
     );

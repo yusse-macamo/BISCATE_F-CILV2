@@ -5,12 +5,21 @@ import '../../../../comum/widgets/componentes.dart';
 import '../../../../comum/widgets/linha_fotos.dart';
 import '../../../../nucleo/tema/tema_app.dart';
 import '../../../../nucleo/utilitarios/formatacao_mt.dart';
+import '../../../../nucleo/utilitarios/imagens.dart';
 import '../../../catalogo/apresentacao/controladores/catalogo_controlador.dart';
 import '../../../catalogo/dados/modelos/categoria_modelo.dart';
+import '../../../catalogo/dados/modelos/servico_modelo.dart';
+import '../../../catalogo/dados/modelos/zona_modelo.dart';
+import '../../dados/modelos/concurso_modelo.dart';
+import '../controladores/concursos_controlador.dart';
 import '../widgets/campo_dinheiro.dart';
 import 'ecra_propostas.dart';
 
 /// 16 · Cliente · Publicar concurso
+///
+/// Insere em `concursos` com `fecha_em` = agora + 48 h. A faixa de preços vem
+/// de `vw_referencia_precos` por serviço e município; sem linha, não se
+/// mostra faixa nenhuma.
 class EcraPublicarConcurso extends ConsumerStatefulWidget {
   const EcraPublicarConcurso({super.key});
 
@@ -20,27 +29,70 @@ class EcraPublicarConcurso extends ConsumerStatefulWidget {
 }
 
 class _EstadoEcraPublicarConcurso extends ConsumerState<EcraPublicarConcurso> {
-  /// O `id` da categoria escolhida, não o nome.
-  String? _categoriaId;
-  String _quando = 'Esta semana';
-  String _prazo = '48 horas';
-  int _fotos = 1;
-  final _titulo = TextEditingController(
-    text: 'Substituir canos da casa de banho',
-  );
-  final _orcamento = TextEditingController(text: '1 500');
+  final _titulo = TextEditingController();
+  final _descricao = TextEditingController();
+  final _orcamento = TextEditingController();
 
   static void _ignorar(String _) {}
+  static const _aCarregar = CaixaSeleccao(
+    altura: 46,
+    valor: 'A carregar…',
+    opcoes: [],
+    aoMudar: _ignorar,
+    activa: false,
+  );
 
   @override
   void dispose() {
     _titulo.dispose();
+    _descricao.dispose();
     _orcamento.dispose();
     super.dispose();
   }
 
+  Future<void> _escolherFoto(PublicacaoControlador c) async {
+    const camara = 'Tirar fotografia';
+    const galeria = 'Escolher da galeria';
+    final opcao = await escolherOpcao(
+      context,
+      const [camara, galeria],
+      '',
+      titulo: 'Fotografia',
+    );
+    if (opcao == null) return;
+    await c.adicionarFoto(
+      opcao == camara ? OrigemImagem.camara : OrigemImagem.galeria,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final estado = ref.watch(publicacaoControladorProvider);
+    final c = ref.read(publicacaoControladorProvider.notifier);
+    ref.listen(publicacaoControladorProvider.select((e) => e.publicado), (
+      _,
+      publicado,
+    ) {
+      final id = ref.read(publicacaoControladorProvider).concursoId;
+      if (!publicado || id == null) return;
+      mostrarAviso(
+        context,
+        'Concurso publicado. Os prestadores da zona foram notificados.',
+      );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => EcraPropostas(concursoId: id)),
+      );
+    });
+    final fechado = estado.gravado || estado.aEnviar;
+    final zonas = ref.watch(zonasProvider);
+    final municipio = zonas.valueOrNull
+        ?.where((z) => z.id == estado.zonaId)
+        .firstOrNull
+        ?.municipio;
+    final referencia = ref
+        .watch(referenciaPrecoProvider((estado.servicoId, municipio)))
+        .valueOrNull;
+
     return EcraBase(
       child: ScrollPreenchido(
         preenchimento: const EdgeInsets.fromLTRB(20, 6, 20, 20),
@@ -52,57 +104,104 @@ class _EstadoEcraPublicarConcurso extends ConsumerState<EcraPublicarConcurso> {
           ),
           ComRotulo(
             rotulo: 'O que precisa?',
-            child: CampoTexto(controlador: _titulo, altura: 46),
+            erro: estado.erros['titulo'],
+            child: CampoTexto(
+              controlador: _titulo,
+              altura: 46,
+              textoDica: 'Ex.: Substituir canos da casa de banho',
+              aoMudar: (_) => c.limparErro('titulo'),
+            ),
           ),
           ComRotulo(
             rotulo: 'Categoria',
+            erro: estado.erros['categoria'],
             child: VistaLista<CategoriaModelo>(
               valor: ref.watch(categoriasProvider),
               aoRepetir: () => ref.invalidate(categoriasProvider),
               mensagemVazia: 'Ainda não há categorias disponíveis.',
-              aCarregar: const CaixaSeleccao(
-                altura: 46,
-                valor: 'A carregar…',
-                opcoes: [],
-                aoMudar: _ignorar,
-                activa: false,
-              ),
+              aCarregar: _aCarregar,
               construir: (categorias) => CaixaSeleccao(
                 altura: 46,
                 titulo: 'Categoria',
+                activa: !fechado,
                 valor:
                     categorias
-                        .where((c) => c.id == _categoriaId)
+                        .where((x) => x.id == estado.categoriaId)
                         .firstOrNull
                         ?.nome ??
                     'Escolher',
-                opcoes: [for (final c in categorias) c.nome],
-                aoMudar: (nome) => setState(
-                  () => _categoriaId = categorias
-                      .firstWhere((c) => c.nome == nome)
-                      .id,
+                opcoes: [for (final x in categorias) x.nome],
+                aoMudar: (nome) => c.escolherCategoria(
+                  categorias.firstWhere((x) => x.nome == nome).id,
                 ),
               ),
             ),
           ),
-          const ComRotulo(
+          if (estado.categoriaId != null)
+            ComRotulo(
+              rotulo: 'Serviço',
+              erro: estado.erros['servico'],
+              child: VistaLista<ServicoModelo>(
+                valor: ref.watch(servicosProvider),
+                aoRepetir: () => ref.invalidate(servicosProvider),
+                mensagemVazia: 'Ainda não há serviços disponíveis.',
+                aCarregar: _aCarregar,
+                construir: (todos) {
+                  final servicos = servicosDaCategoria(
+                    todos,
+                    estado.categoriaId!,
+                  );
+                  if (servicos.isEmpty) {
+                    return const EstadoVazio(
+                      'Esta categoria ainda não tem serviços.',
+                    );
+                  }
+                  return CaixaSeleccao(
+                    altura: 46,
+                    titulo: 'Serviço',
+                    activa: !fechado,
+                    valor:
+                        servicos
+                            .where((s) => s.id == estado.servicoId)
+                            .firstOrNull
+                            ?.nome ??
+                        'Escolher',
+                    opcoes: [for (final s in servicos) s.nome],
+                    aoMudar: (nome) => c.escolherServico(
+                      servicos.firstWhere((s) => s.nome == nome).id,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ComRotulo(
             rotulo: 'Descrição',
+            erro: estado.erros['descricao'],
             child: CampoTexto(
+              controlador: _descricao,
               altura: 70,
               multilinha: true,
               tamanhoFonte: 14,
-              valorInicial:
-                  'Canos por baixo do lavatório com fuga. Trocar tubo e sifão.',
+              textoDica: 'Ex.: Canos por baixo do lavatório com fuga.',
+              aoMudar: (_) => c.limparErro('descricao'),
             ),
           ),
           ComRotulo(
             rotulo: 'O seu orçamento',
-            ajuda: 'Serviços parecidos em Maputo: 1 200 – 2 000 MT',
+            erro: estado.erros['orcamento'],
+            // Só com linha na vista; com poucos prestadores, inventar um
+            // intervalo seria enganar o cliente.
+            ajuda: referencia == null || municipio == null
+                ? null
+                : 'Serviços parecidos em $municipio: '
+                      '${formatarMt(referencia.minimo)} – '
+                      '${formatarMt(referencia.maximo)} MT',
             child: CampoDinheiro(
               controlador: _orcamento,
               altura: 60,
               tamanhoFonte: 26,
               destacado: true,
+              aoMudar: (_) => c.limparErro('orcamento'),
             ),
           ),
           GrelhaUniforme(
@@ -115,68 +214,84 @@ class _EstadoEcraPublicarConcurso extends ConsumerState<EcraPublicarConcurso> {
                   tamanhoFonte: 14,
                   mostrarSeta: false,
                   titulo: 'Quando',
-                  valor: _quando,
-                  opcoes: const [
-                    'Hoje',
-                    'Esta semana',
-                    'Próxima semana',
-                    'Sem pressa',
-                  ],
-                  aoMudar: (v) => setState(() => _quando = v),
+                  activa: !fechado,
+                  valor: estado.quando.rotulo,
+                  opcoes: [for (final u in Urgencia.values) u.rotulo],
+                  aoMudar: (v) => c.escolherQuando(
+                    Urgencia.values.firstWhere((u) => u.rotulo == v),
+                  ),
                 ),
               ),
               ComRotulo(
-                rotulo: 'Propostas até',
-                child: CaixaSeleccao(
-                  altura: 46,
-                  tamanhoFonte: 14,
-                  mostrarSeta: false,
-                  titulo: 'Receber propostas durante',
-                  valor: _prazo,
-                  opcoes: const [
-                    '24 horas',
-                    '48 horas',
-                    '72 horas',
-                    '1 semana',
-                  ],
-                  aoMudar: (v) => setState(() => _prazo = v),
+                rotulo: 'Bairro',
+                erro: estado.erros['zona'],
+                child: VistaLista<ZonaModelo>(
+                  valor: zonas,
+                  aoRepetir: () => ref.invalidate(zonasProvider),
+                  mensagemVazia: 'Sem bairros.',
+                  aCarregar: _aCarregar,
+                  construir: (lista) => CaixaSeleccao(
+                    altura: 46,
+                    tamanhoFonte: 14,
+                    titulo: 'Bairro',
+                    activa: !fechado,
+                    valor:
+                        lista
+                            .where((z) => z.id == estado.zonaId)
+                            .firstOrNull
+                            ?.nome ??
+                        'Escolher',
+                    opcoes: [
+                      for (final z in lista) '${z.nome}, ${z.municipio}',
+                    ],
+                    aoMudar: (v) => c.escolherZona(
+                      lista
+                          .firstWhere((z) => '${z.nome}, ${z.municipio}' == v)
+                          .id,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
+          Text(
+            'Recebe propostas durante 48 horas.',
+            style: estiloTexto(12.5, c: CoresApp.atenuado),
+          ),
           LinhaFotos(
-            contagem: _fotos,
+            contagem: 0,
             tamanho: 48,
-            aoAdicionar: () => setState(() => _fotos++),
+            miniaturas: [for (final f in estado.fotos) f.bytes],
+            aoTocarMiniatura: fechado ? null : c.removerFoto,
+            aoAdicionar: fechado ? () {} : () => _escolherFoto(c),
             elementoFinal: Text(
-              'Polana Caniço A, Rua 4',
+              'Fotografias (opcional)',
               style: estiloTexto(13, c: CoresApp.atenuado),
             ),
           ),
+          if (estado.erroEnvio != null) MensagemErro(estado.erroEnvio!),
           const Spacer(),
+          if (estado.gravado && estado.erroEnvio != null && !estado.aEnviar)
+            BotaoContorno(
+              'Continuar sem as fotografias',
+              aoTocar: c.terminarSemFotografias,
+            ),
           BotaoPrimario(
-            'Publicar concurso',
-            aoTocar: () {
-              final orcamento = lerMt(_orcamento.text);
-              if (orcamento <= 0) {
-                mostrarAviso(context, 'Indique o seu orçamento.');
-                return;
-              }
-              mostrarAviso(
-                context,
-                'Concurso publicado. Os prestadores da zona foram notificados.',
-              );
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => EcraPropostas(
-                    titulo: _titulo.text.trim().isEmpty
-                        ? 'Concurso'
-                        : _titulo.text.trim(),
-                    orcamento: '${formatarMt(orcamento)} MT',
-                  ),
-                ),
-              );
-            },
+            estado.aEnviar
+                ? (estado.etapa ?? 'A publicar…')
+                : estado.gravado
+                ? 'Tentar enviar as fotografias'
+                : 'Publicar concurso',
+            aoTocar: estado.aEnviar
+                ? null
+                : () {
+                    FocusScope.of(context).unfocus();
+                    c.publicar(
+                      titulo: _titulo.text,
+                      descricao: _descricao.text,
+                      orcamento: _orcamento.text,
+                    );
+                  },
           ),
         ],
       ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../comum/dados/dados_exemplo.dart';
 import '../../../../comum/widgets/componentes.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/navegacao/navegacao.dart';
 import '../../../../nucleo/tema/tema_app.dart';
 import '../../../cliente/apresentacao/ecras/ecra_principal_cliente.dart';
+import '../../../concursos/apresentacao/controladores/concursos_controlador.dart';
 import '../../../concursos/apresentacao/ecras/ecra_oportunidades.dart';
 import '../../dados/modelos/painel_prestador_modelo.dart';
 import '../../../pedidos/apresentacao/controladores/pedidos_controlador.dart';
@@ -18,9 +18,9 @@ import 'ecra_principal_prestador.dart';
 /// 10 · Painel
 ///
 /// Nome, foto, título ou categoria, zonas e estatísticas vêm de
-/// `prestadores` + `perfis`; o pedido novo mais recente, de `pedidos`. Os
-/// concursos, os ganhos e o plano continuam de exemplo até esses passos serem
-/// ligados.
+/// `prestadores` + `perfis`; o pedido novo mais recente, de `pedidos`; o
+/// número de concursos abertos, de `concursos`. Os ganhos do mês e o selo do
+/// plano continuam escritos no ecrã (não há fonte na base para os ganhos).
 class EcraPainel extends ConsumerWidget {
   const EcraPainel({super.key});
 
@@ -208,10 +208,7 @@ class EcraPainel extends ConsumerWidget {
                               style: estiloTexto(15, w: w800),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '${DadosExemplo.concursos.length} na sua zona · responda com o seu valor',
-                              style: estiloTexto(13, c: CoresApp.atenuado),
-                            ),
+                            const _ResumoOportunidades(),
                           ],
                         ),
                       ),
@@ -307,6 +304,28 @@ class _ProximoPedido extends ConsumerWidget {
             return _CartaoNovo(novo, aoTocar: abrirPedidos);
           },
         );
+  }
+}
+
+/// "3 na sua zona · responda com o seu valor", a partir das oportunidades
+/// reais. Enquanto carrega ou se falhar, não inventa um número.
+class _ResumoOportunidades extends ConsumerWidget {
+  const _ResumoOportunidades();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final texto = ref
+        .watch(oportunidadesProvider)
+        .when(
+          loading: () => 'A procurar concursos…',
+          error: (_, _) => 'Toque para ver os concursos',
+          data: (lista) => switch (lista.length) {
+            0 => 'Nenhum aberto nas suas zonas de momento',
+            1 => '1 na sua zona · responda com o seu valor',
+            final n => '$n na sua zona · responda com o seu valor',
+          },
+        );
+    return Text(texto, style: estiloTexto(13, c: CoresApp.atenuado));
   }
 }
 

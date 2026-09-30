@@ -101,9 +101,13 @@ class EcraCatalogo extends StatelessWidget {
             (
               '18',
               'Prestador · Responder',
-              () => const EcraResponderConcurso(),
+              () => const EcraResponderConcurso(concursoId: ''),
             ),
-            ('19', 'Cliente · Escolher prestador', () => const EcraPropostas()),
+            (
+              '19',
+              'Cliente · Escolher prestador',
+              () => const EcraPropostas(concursoId: ''),
+            ),
             (
               '20',
               'Cliente · Confirmação',
