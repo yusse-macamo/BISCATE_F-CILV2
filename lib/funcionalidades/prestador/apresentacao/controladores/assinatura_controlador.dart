@@ -58,14 +58,16 @@ String? textoSeloPlano(SituacaoAssinatura s) {
   final a = s.assinatura;
   if (a != null && a.activa) return a.planoNome;
   final g = s.gratuito;
-  if (g != null && ((g.diasRestantes ?? 0) > 0 || (g.trabalhosRestantes ?? 0) > 0)) {
+  if (g != null &&
+      ((g.diasRestantes ?? 0) > 0 || (g.trabalhosRestantes ?? 0) > 0)) {
     return 'Grátis';
   }
   return null;
 }
 
 /// "12/9/2026".
-String textoData(DateTime? d) => d == null ? '' : '${d.day}/${d.month}/${d.year}';
+String textoData(DateTime? d) =>
+    d == null ? '' : '${d.day}/${d.month}/${d.year}';
 
 /// A frase por baixo do título: plano activo, período gratuito, ou nada.
 String resumoSituacao(SituacaoAssinatura s) {

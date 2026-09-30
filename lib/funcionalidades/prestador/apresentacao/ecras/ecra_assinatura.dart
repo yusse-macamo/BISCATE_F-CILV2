@@ -9,8 +9,9 @@ import '../controladores/assinatura_controlador.dart';
 
 /// 15 · Assinatura
 ///
-/// Só leitura: planos, a assinatura do próprio e o período gratuito
-/// (`vw_estado_gratuito`). A confirmação de pagamento ainda não existe.
+/// Só leitura: planos, a assinatura e os pagamentos do próprio, e o período
+/// gratuito (`vw_estado_gratuito`). A confirmação de pagamento ainda não
+/// existe: o botão simula.
 class EcraAssinatura extends ConsumerStatefulWidget {
   const EcraAssinatura({super.key});
 
@@ -72,6 +73,39 @@ class _EstadoEcraAssinatura extends ConsumerState<EcraAssinatura> {
               s.assinatura?.activa == true && s.assinatura?.planoId == plano.id,
           aoTocar: () => setState(() => _seleccionado = plano.id),
         ),
+      Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Text('Pagamentos', style: estiloTexto(16, w: w800)),
+      ),
+      VistaLista<PagamentoModelo>(
+        valor: ref.watch(pagamentosProvider),
+        aoRepetir: () => ref.invalidate(pagamentosProvider),
+        mensagemVazia: 'Ainda não fez pagamentos.',
+        construir: (pagamentos) => Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: CoresApp.borda),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < pagamentos.length; i++)
+                LinhaChaveValor(
+                  rotulo: [
+                    textoData(pagamentos[i].data),
+                    ?pagamentos[i].planoNome,
+                  ].where((t) => t.isNotEmpty).join(' · '),
+                  valor: Text(
+                    textoPrecoPlano(pagamentos[i].valor),
+                    style: estiloTexto(14, w: w700),
+                  ),
+                  ultimo: i == pagamentos.length - 1,
+                ),
+            ],
+          ),
+        ),
+      ),
       const Spacer(),
       // TODO: ligar a confirmação de pagamento (M-Pesa, e-Mola). A app não
       // escreve em `assinaturas` nem em `pagamentos`; isso é do servidor.

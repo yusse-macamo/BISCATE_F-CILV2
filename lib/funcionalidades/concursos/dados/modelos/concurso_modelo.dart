@@ -73,7 +73,7 @@ class NovoConcursoModelo {
   const NovoConcursoModelo({
     required this.clienteId,
     required this.categoriaId,
-    required this.servicoId,
+    this.servicoId,
     required this.titulo,
     required this.descricao,
     required this.orcamento,
@@ -87,7 +87,9 @@ class NovoConcursoModelo {
 
   final String clienteId;
   final String categoriaId;
-  final String servicoId;
+
+  /// Nulo quando o cliente escolheu "Outro serviço" e o descreveu no texto.
+  final String? servicoId;
   final String titulo;
   final String descricao;
   final int orcamento;
@@ -116,6 +118,7 @@ class ConcursoModelo {
     required this.id,
     required this.titulo,
     required this.estado,
+    this.clienteId,
     this.descricao = '',
     this.orcamento,
     this.quando,
@@ -140,6 +143,7 @@ class ConcursoModelo {
       id: '${json['id']}',
       titulo: json['titulo'] as String? ?? 'Concurso',
       estado: EstadoConcurso.deTexto(json['estado'] as String?),
+      clienteId: json['cliente_id'] == null ? null : '${json['cliente_id']}',
       descricao: json['descricao'] as String? ?? '',
       orcamento: (json['orcamento_cliente'] as num?)?.toInt(),
       quando: Urgencia.deTexto(json['quando'] as String?),
@@ -162,6 +166,9 @@ class ConcursoModelo {
   final String id;
   final String titulo;
   final EstadoConcurso estado;
+
+  /// Quem publicou. Um prestador não responde a um concurso seu.
+  final String? clienteId;
   final String descricao;
   final int? orcamento;
   final Urgencia? quando;

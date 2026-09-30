@@ -13,6 +13,7 @@ import 'package:biscate_facil/funcionalidades/concursos/dados/modelos/concurso_m
 import 'package:biscate_facil/funcionalidades/concursos/dados/repositorios/concursos_repositorio.dart';
 import 'package:biscate_facil/funcionalidades/pedidos/dados/modelos/pedido_modelo.dart';
 import 'package:biscate_facil/funcionalidades/pedidos/dados/repositorios/pedidos_repositorio.dart';
+import 'package:biscate_facil/funcionalidades/prestador/dados/repositorios/prestador_repositorio.dart';
 import 'package:biscate_facil/funcionalidades/prestador/apresentacao/ecras/ecra_gestao_pedidos.dart';
 import 'package:biscate_facil/funcionalidades/trabalhos/dados/modelos/trabalho_modelo.dart';
 import 'package:biscate_facil/funcionalidades/trabalhos/dados/repositorios/trabalhos_repositorio.dart';
@@ -40,8 +41,25 @@ class _ProcuraFalsa extends ProcuraRepositorio {
   Future<String?> zonaDoCliente(String clienteId) async => 'fomento';
 }
 
+/// Quem publica pode também ser prestador (categoria e zonas).
+class _PrestadorFalso extends PrestadorRepositorio {
+  _PrestadorFalso(this.categoria) : super(_clienteFalso);
+
+  final String? categoria;
+
+  @override
+  Future<String?> obterCategoriaId(String perfilId) async => categoria;
+}
+
 class _ConcursosFalsos extends ConcursosRepositorio {
-  _ConcursosFalsos({this.faixa}) : super(_clienteFalso);
+  _ConcursosFalsos({this.faixa, this.zonasPrestador = const []})
+    : super(_clienteFalso);
+
+  final List<String> zonasPrestador;
+
+  @override
+  Future<List<String>> zonasDoPrestador(String prestadorId) async =>
+      zonasPrestador;
 
   final ReferenciaPrecoModelo? faixa;
   final publicados = <Map<String, dynamic>>[];
@@ -82,8 +100,14 @@ const _concurso = ConcursoModelo(
   orcamento: 1500,
 );
 
-List<Override> _substituicoes(_ConcursosFalsos concursos) => [
+List<Override> _substituicoes(
+  _ConcursosFalsos concursos, {
+  String? categoriaComoPrestador,
+}) => [
   autenticacaoRepositorioProvider.overrideWithValue(_AutenticacaoFalsa()),
+  prestadorRepositorioProvider.overrideWithValue(
+    _PrestadorFalso(categoriaComoPrestador),
+  ),
   procuraRepositorioProvider.overrideWithValue(_ProcuraFalsa()),
   concursosRepositorioProvider.overrideWithValue(concursos),
   sessaoProvider.overrideWith((ref) => Stream.value(null)),
@@ -149,6 +173,66 @@ void main() {
           'descricao',
           'orcamento',
         ]),
+      );
+    });
+
+    test(
+      '"Outro serviço": sem servico_id, texto no início da descrição',
+      () async {
+        final (container, repo) = preparar();
+        final c = container.read(publicacaoControladorProvider.notifier);
+        await Future<void>.delayed(Duration.zero);
+        c
+          ..escolherCategoria('canalizacao')
+          ..escolherOutroServico();
+        await c.publicar(
+          titulo: 'Toldo na varanda',
+          descricao: 'Varanda de 3 metros.',
+          orcamento: '2 000',
+        );
+        expect(repo.publicados, isEmpty, reason: 'falta descrever o serviço');
+        expect(
+          container.read(publicacaoControladorProvider).erros.keys,
+          contains('outro'),
+        );
+
+        await c.publicar(
+          titulo: 'Toldo na varanda',
+          descricao: 'Varanda de 3 metros.',
+          orcamento: '2 000',
+          outroServico: 'Montar um toldo',
+        );
+        final json = repo.publicados.single;
+        expect(json['servico_id'], isNull);
+        expect(
+          json['descricao'],
+          'Serviço pedido: Montar um toldo.\n\nVaranda de 3 metros.',
+        );
+      },
+    );
+
+    test('prestador da categoria que atende na zona não publica', () async {
+      final repo = _ConcursosFalsos(zonasPrestador: const ['fomento']);
+      final container = ProviderContainer(
+        overrides: _substituicoes(repo, categoriaComoPrestador: 'canalizacao'),
+      );
+      addTearDown(container.dispose);
+      final sub = container.listen(publicacaoControladorProvider, (_, _) {});
+      addTearDown(sub.close);
+      final c = container.read(publicacaoControladorProvider.notifier);
+      await Future<void>.delayed(Duration.zero);
+      c
+        ..escolherCategoria('canalizacao')
+        ..escolherServico('desentupir');
+      await c.publicar(
+        titulo: 'Substituir canos da casa de banho',
+        descricao: 'Canos por baixo do lavatório com fuga.',
+        orcamento: '1 500',
+      );
+      expect(repo.publicados, isEmpty);
+      expect(
+        container.read(publicacaoControladorProvider).erroEnvio,
+        contains('seu próprio concurso'),
       );
     });
 
@@ -243,6 +327,22 @@ void main() {
         expect(repo.respostas.single.containsKey('justificacao'), isFalse);
       },
     );
+
+    test('não responde a um concurso seu', () async {
+      final (container, repo) = preparar();
+      const meu = ConcursoModelo(
+        id: 'concurso-1',
+        titulo: 'Meu',
+        estado: EstadoConcurso.aberto,
+        clienteId: 'utilizador-1',
+        orcamento: 1500,
+      );
+      final c = container.read(
+        respostaControladorProvider('concurso-1').notifier,
+      )..escolherTipo(TipoProposta.aceitaOrcamento);
+      await c.enviar(concurso: meu, valorTexto: '', justificacao: '');
+      expect(repo.respostas, isEmpty);
+    });
 
     test('responder duas vezes mostra "Já respondeu"', () async {
       final (container, repo) = preparar();

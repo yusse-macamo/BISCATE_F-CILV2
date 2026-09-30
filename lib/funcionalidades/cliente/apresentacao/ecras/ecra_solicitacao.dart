@@ -6,6 +6,7 @@ import '../../../../comum/widgets/linha_fotos.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/navegacao/navegacao.dart';
 import '../../../../nucleo/utilitarios/imagens.dart';
+import '../../../autenticacao/dados/repositorios/autenticacao_repositorio.dart';
 import '../../../catalogo/apresentacao/controladores/catalogo_controlador.dart';
 import '../../../catalogo/dados/modelos/zona_modelo.dart';
 import '../../../pedidos/apresentacao/controladores/pedidos_controlador.dart';
@@ -52,14 +53,19 @@ class _EstadoEcraSolicitacao extends ConsumerState<EcraSolicitacao> {
           ? null
           : 'a ${widget.nomePrestador}',
     );
-    if (prestadorId == null) {
+    final proprio =
+        prestadorId != null &&
+        prestadorId == ref.read(autenticacaoRepositorioProvider).utilizadorId;
+    if (prestadorId == null || proprio) {
       return EcraBase(
         child: ScrollPreenchido(
           preenchimento: const EdgeInsets.fromLTRB(20, 6, 20, 20),
           children: [
             titulo,
-            const EstadoVazio(
-              'Escolha um prestador para lhe pedir um serviço.',
+            EstadoVazio(
+              proprio
+                  ? 'Não pode pedir um serviço a si próprio.'
+                  : 'Escolha um prestador para lhe pedir um serviço.',
             ),
           ],
         ),

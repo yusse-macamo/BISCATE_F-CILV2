@@ -5,6 +5,7 @@ import '../../../../comum/widgets/componentes.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/tema/tema_app.dart';
 import '../../../../nucleo/utilitarios/formatacao_mt.dart';
+import '../../../autenticacao/dados/repositorios/autenticacao_repositorio.dart';
 import '../../dados/modelos/concurso_modelo.dart';
 import '../controladores/concursos_controlador.dart';
 import '../widgets/campo_dinheiro.dart';
@@ -135,7 +136,10 @@ class _EstadoEcraResponderConcurso
           ],
         ),
       ),
-      if (t.jaRespondido)
+      if (t.clienteId != null &&
+          t.clienteId == ref.read(autenticacaoRepositorioProvider).utilizadorId)
+        const EstadoVazio('Este concurso é seu: não lhe pode responder.')
+      else if (t.jaRespondido)
         const EstadoVazio('Já respondeu a este concurso.')
       else if (!aberto)
         EstadoVazio(

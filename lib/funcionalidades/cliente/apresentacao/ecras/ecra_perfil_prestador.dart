@@ -5,6 +5,7 @@ import '../../../../comum/widgets/componentes.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/navegacao/navegacao.dart';
 import '../../../../nucleo/tema/tema_app.dart';
+import '../../../autenticacao/dados/repositorios/autenticacao_repositorio.dart';
 import '../../../prestador/dados/repositorios/portfolio_repositorio.dart';
 import '../../dados/modelos/prestador_publico_modelo.dart';
 import '../../dados/repositorios/avaliacoes_repositorio.dart';
@@ -91,56 +92,78 @@ class _Perfil extends ConsumerWidget {
       if (p.anosExperiencia case final anos? when anos > 0)
         anos == 1 ? '1 ano de experiência' : '$anos anos de experiência',
     ].join(' · ');
+    // Um prestador não pede serviço a si próprio (a base também o impede).
+    final proprio =
+        p.perfilId == ref.read(autenticacaoRepositorioProvider).utilizadorId;
 
     return EcraBase(
       topoSeguro: false,
-      barraInferior: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: CoresApp.borda)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 14, 20, 22),
-            child: Row(
-              children: [
-                BotaoContorno(
-                  'Ligar',
-                  largura: 52,
-                  altura: 52,
-                  tamanhoFonte: 12,
-                  aoTocar: () =>
-                      mostrarAviso(context, 'A ligar para ${p.nome}…'),
-                ),
-                const SizedBox(width: 10),
-                BotaoContorno(
-                  'WhatsApp',
-                  largura: 52,
-                  altura: 52,
-                  tamanhoFonte: 10.5,
-                  aoTocar: () => mostrarAviso(context, 'A abrir WhatsApp…'),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: BotaoPrimario(
-                    'Solicitar serviço',
-                    altura: 52,
-                    tamanhoFonte: 15,
-                    aoTocar: () => navegarPara(
-                      context,
-                      EcraSolicitacao(
-                        prestadorId: p.perfilId,
-                        nomePrestador: p.nome,
-                      ),
-                    ),
+      barraInferior: proprio
+          ? Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: CoresApp.borda)),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 18),
+                  child: Text(
+                    'Este é o seu perfil, tal como os clientes o vêem.',
+                    textAlign: TextAlign.center,
+                    style: estiloTexto(13.5, c: CoresApp.atenuado),
                   ),
                 ),
-              ],
+              ),
+            )
+          : Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: CoresApp.borda)),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 22),
+                  child: Row(
+                    children: [
+                      BotaoContorno(
+                        'Ligar',
+                        largura: 52,
+                        altura: 52,
+                        tamanhoFonte: 12,
+                        aoTocar: () =>
+                            mostrarAviso(context, 'A ligar para ${p.nome}…'),
+                      ),
+                      const SizedBox(width: 10),
+                      BotaoContorno(
+                        'WhatsApp',
+                        largura: 52,
+                        altura: 52,
+                        tamanhoFonte: 10.5,
+                        aoTocar: () =>
+                            mostrarAviso(context, 'A abrir WhatsApp…'),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: BotaoPrimario(
+                          'Solicitar serviço',
+                          altura: 52,
+                          tamanhoFonte: 15,
+                          aoTocar: () => navegarPara(
+                            context,
+                            EcraSolicitacao(
+                              prestadorId: p.perfilId,
+                              nomePrestador: p.nome,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [

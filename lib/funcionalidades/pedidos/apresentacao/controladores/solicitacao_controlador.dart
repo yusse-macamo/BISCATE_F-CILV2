@@ -192,6 +192,13 @@ class SolicitacaoControlador
       );
       return;
     }
+    // A base também o impede por restrição; aqui evita o pedido inútil.
+    if (clienteId == arg) {
+      state = state.copiarCom(
+        erroEnvio: 'Não pode pedir um serviço a si próprio.',
+      );
+      return;
+    }
     final descricaoLimpa = descricao.trim();
     final enderecoLimpo = endereco.trim();
     if (!state.pedidoGravado) {

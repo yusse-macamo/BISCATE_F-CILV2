@@ -463,6 +463,8 @@ class CaixaSeleccao extends StatelessWidget {
   }
 }
 
+/// Folha de opções. Com muitas opções não transborda: tem altura máxima e
+/// rola, e a partir de [opcoesComProcura] mostra um campo de procura.
 Future<String?> escolherOpcao(
   BuildContext context,
   List<String> opcoes,
@@ -471,62 +473,150 @@ Future<String?> escolherOpcao(
 }) {
   return showModalBottomSheet<String>(
     context: context,
+    isScrollControlled: true,
     backgroundColor: CoresApp.pagina,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (ctx) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: CoresApp.borda,
-                  borderRadius: BorderRadius.circular(2),
+    builder: (_) =>
+        _FolhaOpcoes(opcoes: opcoes, actual: actual, titulo: titulo),
+  );
+}
+
+/// Acima deste número de opções, a folha mostra um campo de procura.
+const opcoesComProcura = 8;
+
+class _FolhaOpcoes extends StatefulWidget {
+  const _FolhaOpcoes({required this.opcoes, required this.actual, this.titulo});
+
+  final List<String> opcoes;
+  final String actual;
+  final String? titulo;
+
+  @override
+  State<_FolhaOpcoes> createState() => _EstadoFolhaOpcoes();
+}
+
+class _EstadoFolhaOpcoes extends State<_FolhaOpcoes> {
+  final _procura = TextEditingController();
+  String _texto = '';
+
+  @override
+  void dispose() {
+    _procura.dispose();
+    super.dispose();
+  }
+
+  static String _normalizar(String s) {
+    const de = 'áàâãäéèêëíìîïóòôõöúùûüç';
+    const para = 'aaaaaeeeeiiiiooooouuuuc';
+    final saida = StringBuffer();
+    for (final letra in s.toLowerCase().split('')) {
+      final i = de.indexOf(letra);
+      saida.write(i < 0 ? letra : para[i]);
+    }
+    return saida.toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final comProcura = widget.opcoes.length > opcoesComProcura;
+    final procurado = _normalizar(_texto.trim());
+    final visiveis = procurado.isEmpty
+        ? widget.opcoes
+        : [
+            for (final o in widget.opcoes)
+              if (_normalizar(o).contains(procurado)) o,
+          ];
+
+    return Padding(
+      // Sobe acima do teclado quando a procura tem foco.
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: media.size.height * 0.75),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: CoresApp.borda,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-              ),
+                if (widget.titulo != null) ...[
+                  const SizedBox(height: 14),
+                  Text(widget.titulo!, style: estiloTexto(17, w: w800)),
+                ],
+                if (comProcura) ...[
+                  const SizedBox(height: 12),
+                  CampoTexto(
+                    controlador: _procura,
+                    altura: 44,
+                    tamanhoFonte: 14,
+                    textoDica: 'Procurar',
+                    aoMudar: (v) => setState(() => _texto = v),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Flexible(
+                  child: visiveis.isEmpty
+                      ? const EstadoVazio('Nenhuma opção corresponde.')
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: visiveis.length,
+                          itemBuilder: (context, i) {
+                            final o = visiveis[i];
+                            final escolhida = o == widget.actual;
+                            return Toque(
+                              aoTocar: () => Navigator.pop(context, o),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 4,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        o,
+                                        style: estiloTexto(
+                                          15,
+                                          w: escolhida ? w700 : w500,
+                                        ),
+                                      ),
+                                    ),
+                                    if (escolhida)
+                                      Text(
+                                        '✓',
+                                        style: estiloTexto(
+                                          15,
+                                          w: w800,
+                                          c: CoresApp.verde,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
-            if (titulo != null) ...[
-              const SizedBox(height: 14),
-              Text(titulo, style: estiloTexto(17, w: w800)),
-            ],
-            const SizedBox(height: 8),
-            for (final o in opcoes)
-              Toque(
-                aoTocar: () => Navigator.pop(ctx, o),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 4,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          o,
-                          style: estiloTexto(15, w: o == actual ? w700 : w500),
-                        ),
-                      ),
-                      if (o == actual)
-                        Text(
-                          '✓',
-                          style: estiloTexto(15, w: w800, c: CoresApp.verde),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class BotaoPrimario extends StatelessWidget {

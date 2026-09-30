@@ -85,6 +85,7 @@ class EstadoPublicacao {
   const EstadoPublicacao({
     this.categoriaId,
     this.servicoId,
+    this.outroServico = false,
     this.quando = Urgencia.estaSemana,
     this.zonaId,
     this.fotos = const [],
@@ -99,11 +100,16 @@ class EstadoPublicacao {
 
   final String? categoriaId;
   final String? servicoId;
+
+  /// O cliente escolheu "Outro serviço": não há `servico_id` e o que precisa
+  /// vai escrito no texto do concurso.
+  final bool outroServico;
   final Urgencia quando;
   final String? zonaId;
   final List<ImagemEscolhida> fotos;
 
-  /// `titulo`, `categoria`, `servico`, `descricao`, `orcamento`, `zona`.
+  /// `titulo`, `categoria`, `servico`, `outro`, `descricao`, `orcamento`,
+  /// `zona`.
   final Map<String, String> erros;
   final bool aEnviar;
   final String? etapa;
@@ -121,6 +127,7 @@ class EstadoPublicacao {
     String? categoriaId,
     String? servicoId,
     bool limparServico = false,
+    bool? outroServico,
     Urgencia? quando,
     String? zonaId,
     List<ImagemEscolhida>? fotos,
@@ -136,6 +143,7 @@ class EstadoPublicacao {
   }) => EstadoPublicacao(
     categoriaId: categoriaId ?? this.categoriaId,
     servicoId: limparServico ? null : (servicoId ?? this.servicoId),
+    outroServico: outroServico ?? this.outroServico,
     quando: quando ?? this.quando,
     zonaId: zonaId ?? this.zonaId,
     fotos: fotos ?? this.fotos,
@@ -191,10 +199,19 @@ class PublicacaoControlador extends AutoDisposeNotifier<EstadoPublicacao> {
   void escolherCategoria(String id) => state = state.copiarCom(
     categoriaId: id,
     limparServico: id != state.categoriaId,
+    outroServico: id != state.categoriaId ? false : null,
     erros: {...state.erros}..remove('categoria'),
   );
   void escolherServico(String id) => state = state.copiarCom(
     servicoId: id,
+    outroServico: false,
+    erros: {...state.erros}..remove('servico'),
+  );
+
+  /// "Outro serviço": sem `servico_id`; o cliente descreve o que precisa.
+  void escolherOutroServico() => state = state.copiarCom(
+    limparServico: true,
+    outroServico: true,
     erros: {...state.erros}..remove('servico'),
   );
   void escolherQuando(Urgencia u) => state = state.copiarCom(quando: u);
@@ -227,10 +244,13 @@ class PublicacaoControlador extends AutoDisposeNotifier<EstadoPublicacao> {
     state = state.copiarCom(fotos: [...state.fotos]..removeAt(i));
   }
 
+  static const outroServicoMinimo = 3;
+
   Future<void> publicar({
     required String titulo,
     required String descricao,
     required String orcamento,
+    String outroServico = '',
   }) async {
     if (state.aEnviar || state.publicado) return;
     final clienteId = _clienteId;
@@ -244,7 +264,11 @@ class PublicacaoControlador extends AutoDisposeNotifier<EstadoPublicacao> {
         if (titulo.trim().length < tituloMinimo)
           'titulo': 'Diga em poucas palavras o que precisa.',
         if (state.categoriaId == null) 'categoria': 'Escolha a categoria.',
-        if (state.servicoId == null) 'servico': 'Escolha o serviço.',
+        if (state.servicoId == null && !state.outroServico)
+          'servico': 'Escolha o serviço.',
+        if (state.outroServico &&
+            outroServico.trim().length < outroServicoMinimo)
+          'outro': 'Descreva o serviço de que precisa.',
         if (descricao.trim().length < descricaoMinima)
           'descricao': 'Descreva o trabalho em poucas palavras.',
         if (valor <= 0) 'orcamento': 'Indique o seu orçamento.',
@@ -259,6 +283,15 @@ class PublicacaoControlador extends AutoDisposeNotifier<EstadoPublicacao> {
     state = state.copiarCom(aEnviar: true, limparErroEnvio: true);
     final repositorio = ref.read(concursosRepositorioProvider);
     try {
+      if (!state.gravado && await _podiaProporASiProprio(clienteId)) {
+        state = state.copiarCom(
+          aEnviar: false,
+          erroEnvio:
+              'Presta este serviço nesta zona, por isso poderia responder ao '
+              'seu próprio concurso. Escolha outra categoria ou outro bairro.',
+        );
+        return;
+      }
       var id = state.concursoId;
       if (id == null) {
         state = state.copiarCom(etapa: 'A publicar o concurso…');
@@ -266,9 +299,11 @@ class PublicacaoControlador extends AutoDisposeNotifier<EstadoPublicacao> {
           NovoConcursoModelo(
             clienteId: clienteId,
             categoriaId: state.categoriaId!,
-            servicoId: state.servicoId!,
+            servicoId: state.outroServico ? null : state.servicoId,
             titulo: titulo.trim(),
-            descricao: descricao.trim(),
+            descricao: state.outroServico
+                ? textoComOutroServico(outroServico, descricao)
+                : descricao.trim(),
             orcamento: valor,
             quando: state.quando,
             zonaId: state.zonaId!,
@@ -324,6 +359,19 @@ class PublicacaoControlador extends AutoDisposeNotifier<EstadoPublicacao> {
     state = state.copiarCom(publicado: true, limparErroEnvio: true);
     ref.invalidate(meusConcursosProvider);
   }
+
+  /// Quem publica também é prestador desta categoria e atende nesta zona:
+  /// o concurso apareceria nas oportunidades dele.
+  Future<bool> _podiaProporASiProprio(String clienteId) async {
+    final categoria = await ref
+        .read(prestadorRepositorioProvider)
+        .obterCategoriaId(clienteId);
+    if (categoria == null || categoria != state.categoriaId) return false;
+    final zonas = await ref
+        .read(concursosRepositorioProvider)
+        .zonasDoPrestador(clienteId);
+    return zonas.contains(state.zonaId);
+  }
 }
 
 // ── Responder (tela 18) ────────────────────────────────────────────────────
@@ -378,6 +426,13 @@ class RespostaControlador
       state = EstadoResposta(
         tipo: state.tipo,
         erroEnvio: 'Entre na sua conta de prestador para responder.',
+      );
+      return;
+    }
+    if (concurso.clienteId == prestadorId) {
+      state = EstadoResposta(
+        tipo: state.tipo,
+        erroEnvio: 'Não pode responder a um concurso seu.',
       );
       return;
     }
@@ -469,3 +524,8 @@ String textoFecho(DateTime? fechaEm, DateTime agora) {
 
 String textoOrcamento(int? valor) =>
     valor == null ? 'Sem orçamento' : '${formatarMt(valor)} MT';
+
+/// Com "Outro serviço", o que o cliente escreveu abre o texto do concurso,
+/// para os prestadores saberem o que se pede sem `servico_id`.
+String textoComOutroServico(String outroServico, String descricao) =>
+    'Serviço pedido: ${outroServico.trim()}.\n\n${descricao.trim()}';

@@ -12,6 +12,9 @@ import '../../dados/modelos/painel_prestador_modelo.dart';
 import '../../../pedidos/apresentacao/controladores/pedidos_controlador.dart';
 import '../../../pedidos/dados/modelos/pedido_modelo.dart';
 import '../controladores/painel_controlador.dart';
+import '../../../../nucleo/utilitarios/formatacao_mt.dart';
+import '../../../trabalhos/apresentacao/controladores/trabalhos_controlador.dart';
+import '../controladores/assinatura_controlador.dart';
 import '../controladores/portfolio_controlador.dart';
 import 'ecra_assinatura.dart';
 import 'ecra_portfolio.dart';
@@ -21,8 +24,8 @@ import 'ecra_principal_prestador.dart';
 ///
 /// Nome, foto, título ou categoria, zonas e estatísticas vêm de
 /// `prestadores` + `perfis`; o pedido novo mais recente, de `pedidos`; o
-/// número de concursos abertos, de `concursos`. Os ganhos do mês e o selo do
-/// plano continuam escritos no ecrã (não há fonte na base para os ganhos).
+/// número de concursos abertos, de `concursos`; o selo do plano, de
+/// `assinaturas`; os ganhos do mês, de `trabalhos` concluídos.
 class EcraPainel extends ConsumerWidget {
   const EcraPainel({super.key});
 
@@ -115,19 +118,7 @@ class EcraPainel extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () => navegarPara(context, const EcraAssinatura()),
-                      child: Selo(
-                        'Premium',
-                        fundo: Colors.white,
-                        frente: CoresApp.verdeEscuro,
-                        raio: 12,
-                        preenchimento: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                      ),
-                    ),
+                    const _SeloPlano(),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -136,15 +127,7 @@ class EcraPainel extends ConsumerWidget {
                   style: estiloTexto(13, c: CoresApp.sobreVerdeEscuroAtenuado),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  '18 400 MT',
-                  style: estiloTexto(34, w: w800, c: Colors.white, ls: -0.02),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '+22% face a Agosto',
-                  style: estiloTexto(13, c: CoresApp.sobreVerdeEscuroAtenuado),
-                ),
+                const _Ganhos(),
               ],
             ),
           ),
@@ -307,6 +290,75 @@ class _ProximoPedido extends ConsumerWidget {
             return _CartaoNovo(novo, aoTocar: abrirPedidos);
           },
         );
+  }
+}
+
+/// Ganhos do mês (soma de `valor_acordado` dos trabalhos concluídos) e a
+/// variação face ao mês anterior. Sem trabalhos, 0 MT e sem variação.
+class _Ganhos extends ConsumerWidget {
+  const _Ganhos();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final apoio = estiloTexto(13, c: CoresApp.sobreVerdeEscuroAtenuado);
+    final valor = estiloTexto(34, w: w800, c: Colors.white, ls: -0.02);
+    return ref
+        .watch(ganhosPrestadorProvider)
+        .when(
+          loading: () => Text('—', style: valor),
+          error: (erro, _) => GestureDetector(
+            onTap: () => ref.invalidate(ganhosPrestadorProvider),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('—', style: valor),
+                Text(
+                  '${mensagemDe(erro)} Tocar para tentar de novo.',
+                  style: apoio,
+                ),
+              ],
+            ),
+          ),
+          data: (g) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${formatarMt(g.mesActual)} MT', style: valor),
+              if (g.variacao case final v?) ...[
+                const SizedBox(height: 2),
+                Text(
+                  '${v > 0 ? '+' : ''}$v% face a ${g.nomeMesAnterior}',
+                  style: apoio,
+                ),
+              ],
+            ],
+          ),
+        );
+  }
+}
+
+/// O plano do prestador, lido de `assinaturas` e `vw_estado_gratuito`: o nome
+/// do plano activo, "Grátis" no período gratuito, ou "Ver planos" se não
+/// tiver nenhum. Enquanto carrega ou se falhar, não mostra nada inventado.
+class _SeloPlano extends ConsumerWidget {
+  const _SeloPlano();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final situacao = ref.watch(situacaoAssinaturaProvider);
+    final texto = situacao.hasValue
+        ? textoSeloPlano(situacao.requireValue) ?? 'Ver planos'
+        : null;
+    if (texto == null) return const SizedBox.shrink();
+    return GestureDetector(
+      onTap: () => navegarPara(context, const EcraAssinatura()),
+      child: Selo(
+        texto,
+        fundo: Colors.white,
+        frente: CoresApp.verdeEscuro,
+        raio: 12,
+        preenchimento: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      ),
+    );
   }
 }
 

@@ -32,6 +32,82 @@ final trabalhosConcursoPrestadorProvider =
       return ref.watch(trabalhosRepositorioProvider).deConcursosDoPrestador(id);
     });
 
+// ── Ganhos (painel do prestador) ─────────────────────────────────────────
+
+/// Ganhos do mês, a partir de `valor_acordado` dos trabalhos concluídos.
+@immutable
+class ResumoGanhos {
+  const ResumoGanhos({
+    required this.mesActual,
+    required this.mesAnterior,
+    required this.nomeMesAnterior,
+  });
+
+  final int mesActual;
+  final int mesAnterior;
+  final String nomeMesAnterior;
+
+  /// Percentagem face ao mês anterior, arredondada. `null` quando o mês
+  /// anterior não teve ganhos: sem base, a variação não tem sentido e
+  /// esconde-se.
+  int? get variacao => mesAnterior <= 0
+      ? null
+      : (((mesActual - mesAnterior) / mesAnterior) * 100).round();
+}
+
+const _meses = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+];
+
+/// Soma os ganhos do mês de [agora] e do mês anterior.
+ResumoGanhos resumirGanhos(
+  List<(int valor, DateTime concluidoEm)> trabalhos,
+  DateTime agora,
+) {
+  final inicioActual = DateTime(agora.year, agora.month);
+  final inicioAnterior = DateTime(agora.year, agora.month - 1);
+  var actual = 0;
+  var anterior = 0;
+  for (final (valor, data) in trabalhos) {
+    if (!data.isBefore(inicioActual)) {
+      actual += valor;
+    } else if (!data.isBefore(inicioAnterior)) {
+      anterior += valor;
+    }
+  }
+  return ResumoGanhos(
+    mesActual: actual,
+    mesAnterior: anterior,
+    nomeMesAnterior: _meses[inicioAnterior.month - 1],
+  );
+}
+
+final ganhosPrestadorProvider = FutureProvider.autoDispose<ResumoGanhos>((
+  ref,
+) async {
+  await ref.watch(sessaoProvider.selectAsync((sessao) => sessao?.user.id));
+  final id = ref.read(autenticacaoRepositorioProvider).utilizadorId;
+  if (id == null) {
+    throw const FalhaApp('Entre na sua conta para ver os seus ganhos.');
+  }
+  final agora = DateTime.now();
+  final trabalhos = await ref
+      .watch(trabalhosRepositorioProvider)
+      .ganhosDoPrestador(id, desde: DateTime(agora.year, agora.month - 1));
+  return resumirGanhos(trabalhos, agora);
+});
+
 // ── Concluir ───────────────────────────────────────────────────────────────
 
 /// `id` dos trabalhos a ser concluídos, para desactivar o botão.

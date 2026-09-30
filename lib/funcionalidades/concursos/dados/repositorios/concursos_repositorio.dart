@@ -17,7 +17,8 @@ class ConcursosRepositorio {
   final SupabaseClient _cliente;
 
   static const _campos =
-      'id, titulo, descricao, estado, orcamento_cliente, quando, fecha_em, '
+      'id, cliente_id, titulo, descricao, estado, orcamento_cliente, quando, '
+      'fecha_em, '
       'criado_em, servicos(nome), zonas(nome, municipio), '
       'propostas(prestador_id)';
 
@@ -138,6 +139,8 @@ class ConcursosRepositorio {
         .select(_campos)
         .eq('estado', EstadoConcurso.aberto.name)
         .eq('categoria_id', categoriaId)
+        // Os concursos que ele próprio publicou não são oportunidades.
+        .neq('cliente_id', prestadorId)
         .inFilter('zona_id', zonaIds)
         .order('criado_em', ascending: false);
     return [

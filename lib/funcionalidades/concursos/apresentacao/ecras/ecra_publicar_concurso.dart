@@ -32,6 +32,9 @@ class _EstadoEcraPublicarConcurso extends ConsumerState<EcraPublicarConcurso> {
   final _titulo = TextEditingController();
   final _descricao = TextEditingController();
   final _orcamento = TextEditingController();
+  final _outro = TextEditingController();
+
+  static const _outroServico = 'Outro serviço';
 
   static void _ignorar(String _) {}
   static const _aCarregar = CaixaSeleccao(
@@ -47,6 +50,7 @@ class _EstadoEcraPublicarConcurso extends ConsumerState<EcraPublicarConcurso> {
     _titulo.dispose();
     _descricao.dispose();
     _orcamento.dispose();
+    _outro.dispose();
     super.dispose();
   }
 
@@ -151,27 +155,39 @@ class _EstadoEcraPublicarConcurso extends ConsumerState<EcraPublicarConcurso> {
                     todos,
                     estado.categoriaId!,
                   );
-                  if (servicos.isEmpty) {
-                    return const EstadoVazio(
-                      'Esta categoria ainda não tem serviços.',
-                    );
-                  }
+                  // "Outro serviço" fica sempre no fim, mesmo sem serviços
+                  // no catálogo desta categoria.
                   return CaixaSeleccao(
                     altura: 46,
                     titulo: 'Serviço',
                     activa: !fechado,
-                    valor:
-                        servicos
-                            .where((s) => s.id == estado.servicoId)
-                            .firstOrNull
-                            ?.nome ??
-                        'Escolher',
-                    opcoes: [for (final s in servicos) s.nome],
-                    aoMudar: (nome) => c.escolherServico(
-                      servicos.firstWhere((s) => s.nome == nome).id,
-                    ),
+                    valor: estado.outroServico
+                        ? _outroServico
+                        : servicos
+                                  .where((s) => s.id == estado.servicoId)
+                                  .firstOrNull
+                                  ?.nome ??
+                              'Escolher',
+                    opcoes: [for (final s in servicos) s.nome, _outroServico],
+                    aoMudar: (nome) => nome == _outroServico
+                        ? c.escolherOutroServico()
+                        : c.escolherServico(
+                            servicos.firstWhere((s) => s.nome == nome).id,
+                          ),
                   );
                 },
+              ),
+            ),
+          if (estado.outroServico)
+            ComRotulo(
+              rotulo: 'Que serviço precisa?',
+              erro: estado.erros['outro'],
+              ajuda: 'Os prestadores da categoria vêem isto no concurso.',
+              child: CampoTexto(
+                controlador: _outro,
+                altura: 46,
+                textoDica: 'Ex.: Montar um toldo na varanda',
+                aoMudar: (_) => c.limparErro('outro'),
               ),
             ),
           ComRotulo(
@@ -290,6 +306,7 @@ class _EstadoEcraPublicarConcurso extends ConsumerState<EcraPublicarConcurso> {
                       titulo: _titulo.text,
                       descricao: _descricao.text,
                       orcamento: _orcamento.text,
+                      outroServico: _outro.text,
                     );
                   },
           ),

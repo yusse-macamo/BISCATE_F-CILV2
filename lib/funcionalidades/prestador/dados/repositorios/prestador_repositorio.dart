@@ -7,6 +7,7 @@ import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/dados/fotos_perfil.dart';
 import '../modelos/novo_prestador_modelo.dart';
 import '../modelos/painel_prestador_modelo.dart';
+import '../modelos/perfil_editavel_modelo.dart';
 
 final prestadorRepositorioProvider = Provider<PrestadorRepositorio>(
   (ref) => PrestadorRepositorio(ref.watch(clienteSupabaseProvider)),
@@ -61,6 +62,77 @@ class PrestadorRepositorio {
           fotoUrl: urlFotoPerfil(_cliente, perfil?['foto'] as String?),
         );
       });
+
+  /// O que o prestador pode editar no seu perfil. `null` se não tem registo
+  /// de prestador.
+  Future<PerfilEditavelModelo?> obterPerfilEditavel(String perfilId) =>
+      executarTraduzido(() async {
+        final linha = await _cliente
+            .from('prestadores')
+            .select(
+              'titulo, bio, anos_experiencia, categorias(nome), '
+              'prestador_zonas(zona_id), '
+              'perfis!prestadores_perfil_id_fkey(telefone, foto)',
+            )
+            .eq('perfil_id', perfilId)
+            .maybeSingle();
+        if (linha == null) return null;
+        final perfil = linha['perfis'] as Map<String, dynamic>?;
+        return PerfilEditavelModelo(
+          titulo: linha['titulo'] as String? ?? '',
+          bio: linha['bio'] as String? ?? '',
+          anosExperiencia: (linha['anos_experiencia'] as num?)?.toInt(),
+          categoria:
+              (linha['categorias'] as Map<String, dynamic>?)?['nome']
+                  as String?,
+          zonaIds: {
+            for (final z
+                in (linha['prestador_zonas'] as List<dynamic>? ?? const []))
+              '${(z as Map<String, dynamic>)['zona_id']}',
+          },
+          telefone: perfil?['telefone'] as String? ?? '',
+          fotoUrl: urlFotoPerfil(_cliente, perfil?['foto'] as String?),
+        );
+      });
+
+  /// Grava em `prestadores` só as colunas que a app pode escrever aqui:
+  /// `titulo`, `bio` e `anos_experiencia`.
+  Future<void> guardarDadosProfissionais(
+    String perfilId, {
+    required String? titulo,
+    required String? bio,
+    required int? anosExperiencia,
+  }) => executarTraduzido(
+    () => _cliente
+        .from('prestadores')
+        .update({
+          'titulo': titulo,
+          'bio': bio,
+          'anos_experiencia': anosExperiencia,
+        })
+        .eq('perfil_id', perfilId),
+  );
+
+  /// `perfis.telefone` do próprio (só dígitos; a base normaliza).
+  Future<void> guardarTelefone(String perfilId, String telefone) =>
+      executarTraduzido(
+        () => _cliente
+            .from('perfis')
+            .update({'telefone': telefone})
+            .eq('id', perfilId),
+      );
+
+  /// Tira as zonas desmarcadas. As novas entram com [associarZonas].
+  Future<void> removerZonas({
+    required String perfilId,
+    required Set<String> zonaIds,
+  }) => executarTraduzido(
+    () => _cliente
+        .from('prestador_zonas')
+        .delete()
+        .eq('prestador_id', perfilId)
+        .inFilter('zona_id', zonaIds.toList()),
+  );
 
   /// Categoria do prestador, ou `null` se este perfil não tem registo de
   /// prestador.

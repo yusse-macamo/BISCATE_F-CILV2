@@ -48,6 +48,25 @@ class TrabalhosRepositorio {
         return [for (final l in linhas) TrabalhoModelo.fromJson(l)];
       });
 
+  /// Valores acordados dos trabalhos concluídos do prestador desde [desde],
+  /// com a data de conclusão, para os ganhos do painel.
+  Future<List<(int valor, DateTime concluidoEm)>> ganhosDoPrestador(
+    String prestadorId, {
+    required DateTime desde,
+  }) => executarTraduzido(() async {
+    final linhas = await _cliente
+        .from('trabalhos')
+        .select('valor_acordado, concluido_em')
+        .eq('prestador_id', prestadorId)
+        .eq('estado', 'concluido')
+        .gte('concluido_em', desde.toUtc().toIso8601String());
+    return [
+      for (final l in linhas)
+        if (DateTime.tryParse('${l['concluido_em']}') case final data?)
+          ((l['valor_acordado'] as num?)?.toInt() ?? 0, data.toLocal()),
+    ];
+  });
+
   /// Marca o trabalho como concluído. Só o cliente o pode fazer: a RLS
   /// impede o prestador.
   Future<void> concluir(String trabalhoId) => executarTraduzido(
