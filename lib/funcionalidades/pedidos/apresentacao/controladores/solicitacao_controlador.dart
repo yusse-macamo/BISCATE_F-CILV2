@@ -248,7 +248,6 @@ class SolicitacaoControlador
         await repositorio.anexar(
           clienteId: clienteId,
           pedidoId: pedidoId,
-          indice: i,
           bytes: bytes,
         );
         if (_descartado) return;

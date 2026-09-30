@@ -5,6 +5,7 @@ import '../../../../comum/widgets/componentes.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/navegacao/navegacao.dart';
 import '../../../../nucleo/tema/tema_app.dart';
+import '../../../../nucleo/utilitarios/imagens.dart';
 import '../../../catalogo/apresentacao/controladores/catalogo_controlador.dart';
 import '../../../catalogo/dados/modelos/zona_modelo.dart';
 import '../../../cliente/apresentacao/widgets/foto_prestador.dart';
@@ -17,7 +18,7 @@ import 'ecra_portfolio.dart';
 ///
 /// Lê e grava os dados reais do prestador autenticado: profissão (título),
 /// descrição, experiência e zonas em `prestadores`/`prestador_zonas`, e o
-/// telefone em `perfis`.
+/// telefone e a foto em `perfis`.
 class EcraEditarPerfil extends ConsumerWidget {
   const EcraEditarPerfil({super.key, this.aoVoltar});
 
@@ -123,12 +124,30 @@ class _EstadoFormulario extends ConsumerState<_Formulario> {
     if (gravado && mounted) mostrarAviso(context, 'Perfil guardado.');
   }
 
+  Future<void> _alterarFoto() async {
+    const camara = 'Tirar fotografia';
+    const galeria = 'Escolher da galeria';
+    final opcao = await escolherOpcao(
+      context,
+      const [camara, galeria],
+      '',
+      titulo: 'Foto de perfil',
+    );
+    if (opcao == null) return;
+    final erro = await ref
+        .read(fotoPerfilControladorProvider.notifier)
+        .alterar(opcao == camara ? OrigemImagem.camara : OrigemImagem.galeria);
+    if (!mounted) return;
+    mostrarAviso(context, erro ?? 'Foto de perfil alterada.');
+  }
+
   @override
   Widget build(BuildContext context) {
     final perfil = widget.perfil;
     final estado = ref.watch(edicaoPerfilControladorProvider);
     final c = ref.read(edicaoPerfilControladorProvider.notifier);
     final zonasEscolhidas = estado.zonas ?? perfil.zonaIds;
+    final aEnviarFoto = ref.watch(fotoPerfilControladorProvider);
 
     return EcraBase(
       child: ListView(
@@ -155,11 +174,29 @@ class _EstadoFormulario extends ConsumerState<_Formulario> {
           ),
           Row(
             children: [
-              FotoPrestador(
-                url: perfil.fotoUrl,
-                largura: 72,
-                altura: 72,
+              Toque(
                 raio: 20,
+                aoTocar: aEnviarFoto ? null : _alterarFoto,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    FotoPrestador(
+                      url: perfil.fotoUrl,
+                      largura: 72,
+                      altura: 72,
+                      raio: 20,
+                    ),
+                    if (aEnviarFoto)
+                      const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: CoresApp.verde,
+                        ),
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -172,6 +209,14 @@ class _EstadoFormulario extends ConsumerState<_Formulario> {
                     Text(
                       'Rosto visível aumenta a confiança',
                       style: estiloTexto(12.5, c: CoresApp.atenuado),
+                    ),
+                    const SizedBox(height: 6),
+                    GestureDetector(
+                      onTap: aEnviarFoto ? null : _alterarFoto,
+                      child: Text(
+                        aEnviarFoto ? 'A enviar a foto…' : 'Alterar foto',
+                        style: estiloTexto(13, w: w700, c: CoresApp.verde),
+                      ),
                     ),
                   ],
                 ),

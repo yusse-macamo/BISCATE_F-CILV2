@@ -17,7 +17,8 @@ import 'ecra_principal_cliente.dart';
 
 /// 07 · Solicitação
 ///
-/// Insere em `pedidos` e envia as fotografias para o Storage (`anexos`).
+/// Insere em `pedidos` e envia as fotografias para o Storage (`publico`),
+/// registando-as em `anexos`.
 /// O serviço tem de ser do catálogo; a data, o período e o bairro vão com os
 /// valores que a base aceita.
 class EcraSolicitacao extends ConsumerStatefulWidget {

@@ -17,6 +17,8 @@ import '../../dados/repositorios/procura_repositorio.dart';
 class FiltroProcura {
   const FiltroProcura({
     this.texto = '',
+    this.categoriaId,
+    this.categoriaNome,
     this.municipio,
     this.zonaId,
     this.zonaNome,
@@ -27,6 +29,10 @@ class FiltroProcura {
   });
 
   final String texto;
+
+  /// `null` = todas as categorias.
+  final String? categoriaId;
+  final String? categoriaNome;
 
   /// `null` = todos os municípios.
   final String? municipio;
@@ -43,6 +49,8 @@ class FiltroProcura {
 
   FiltroProcura copiarCom({
     String? texto,
+    CategoriaModelo? categoria,
+    bool limparCategoria = false,
     String? municipio,
     bool limparMunicipio = false,
     ZonaModelo? zona,
@@ -53,6 +61,8 @@ class FiltroProcura {
     OrdemProcura? ordem,
   }) => FiltroProcura(
     texto: texto ?? this.texto,
+    categoriaId: limparCategoria ? null : (categoria?.id ?? categoriaId),
+    categoriaNome: limparCategoria ? null : (categoria?.nome ?? categoriaNome),
     municipio: limparMunicipio ? null : (municipio ?? this.municipio),
     zonaId: limparZona ? null : (zona?.id ?? zonaId),
     zonaNome: limparZona ? null : (zona?.nome ?? zonaNome),
@@ -66,6 +76,7 @@ class FiltroProcura {
   bool operator ==(Object other) =>
       other is FiltroProcura &&
       other.texto == texto &&
+      other.categoriaId == categoriaId &&
       other.municipio == municipio &&
       other.zonaId == zonaId &&
       other.ate1000 == ate1000 &&
@@ -76,6 +87,7 @@ class FiltroProcura {
   @override
   int get hashCode => Object.hash(
     texto,
+    categoriaId,
     municipio,
     zonaId,
     ate1000,
@@ -116,6 +128,11 @@ class ProcuraControlador
     state = state.copiarCom(texto: '');
   }
 
+  void escolherCategoria(CategoriaModelo? categoria) => state = state.copiarCom(
+    categoria: categoria,
+    limparCategoria: categoria == null,
+  );
+
   /// Mudar de município limpa a zona, que podia ser de outro.
   void escolherMunicipio(String? municipio) => state = state.copiarCom(
     municipio: municipio,
@@ -149,6 +166,7 @@ final resultadosProcuraProvider = FutureProvider.autoDispose
             CriteriosProcura(
               textoLivre: filtro.texto.isEmpty ? null : filtro.texto,
               categoriaIds: categoriasCorrespondentes(categorias, filtro.texto),
+              categoriaId: filtro.categoriaId,
               municipio: filtro.municipio,
               zonaId: filtro.zonaId,
               verificados: filtro.verificados,

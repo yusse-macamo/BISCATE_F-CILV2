@@ -64,8 +64,9 @@ class _PedidosFalsos extends PedidosRepositorio {
   final aceites = <(String, int?)>[];
   final rejeitados = <String>[];
 
-  /// Índice da fotografia cuja primeira tentativa falha.
+  /// Número da chamada a [anexar] (a contar de 0) que falha.
   int? falharAnexoUmaVez;
+  var _tentativasAnexo = 0;
 
   @override
   Future<String> criar(NovoPedidoModelo pedido) async {
@@ -77,14 +78,13 @@ class _PedidosFalsos extends PedidosRepositorio {
   Future<void> anexar({
     required String clienteId,
     required String pedidoId,
-    required int indice,
     required Uint8List bytes,
   }) async {
-    if (falharAnexoUmaVez == indice) {
+    if (falharAnexoUmaVez == _tentativasAnexo++) {
       falharAnexoUmaVez = null;
       throw const FalhaApp(mensagemSemLigacao);
     }
-    anexados.add('$clienteId/$pedidoId/$indice.jpg');
+    anexados.add('$clienteId/$pedidoId');
   }
 
   @override
@@ -256,15 +256,15 @@ void main() {
       expect(estado.erroEnvio, contains('faltam fotografias'));
       expect(pedidos.criados, hasLength(1));
       expect(pedidos.criados.single['zona_id'], 'fomento');
-      expect(pedidos.anexados, ['utilizador-1/pedido-1/0.jpg']);
+      expect(pedidos.anexados, ['utilizador-1/pedido-1']);
 
       await c.enviar(descricao: '', endereco: '');
       estado = container.read(provider);
       expect(estado.enviado, isTrue);
       expect(pedidos.criados, hasLength(1), reason: 'não repete o pedido');
       expect(pedidos.anexados, [
-        'utilizador-1/pedido-1/0.jpg',
-        'utilizador-1/pedido-1/1.jpg',
+        'utilizador-1/pedido-1',
+        'utilizador-1/pedido-1',
       ]);
       expect(compressor.chamadas, 2, reason: 'não volta a comprimir');
     },

@@ -6,6 +6,7 @@ import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/navegacao/navegacao.dart';
 import '../../../../nucleo/tema/tema_app.dart';
 import '../../../catalogo/apresentacao/controladores/catalogo_controlador.dart';
+import '../../../catalogo/dados/modelos/categoria_modelo.dart';
 import '../../../catalogo/dados/modelos/zona_modelo.dart';
 import '../../dados/modelos/prestador_publico_modelo.dart';
 import '../../dados/repositorios/procura_repositorio.dart';
@@ -45,6 +46,36 @@ class _EstadoEcraPesquisa extends ConsumerState<EcraPesquisa> {
 
   ProcuraControlador get _controlador =>
       ref.read(procuraControladorProvider(widget.consultaInicial).notifier);
+
+  /// Categorias vêm de `categorias`. Enquanto carregam, ou se falharem, a
+  /// pílula diz isso em vez de mostrar opções inventadas.
+  Widget _filtroCategoria(
+    FiltroProcura filtro,
+    AsyncValue<List<CategoriaModelo>> categorias,
+  ) => categorias.when(
+    loading: () => const Pilula('A carregar categorias…'),
+    error: (erro, _) => Pilula(
+      'Categorias: tentar de novo',
+      aoTocar: () {
+        mostrarAviso(context, mensagemDe(erro));
+        ref.invalidate(categoriasProvider);
+      },
+    ),
+    data: (lista) => Pilula(
+      '${filtro.categoriaNome ?? 'Categoria'} ▾',
+      seleccionado: filtro.categoriaId != null,
+      aoTocar: () async {
+        final porNome = {for (final c in lista) c.nome: c};
+        final v = await escolherOpcao(
+          context,
+          ['Todas', ...porNome.keys],
+          filtro.categoriaNome ?? 'Todas',
+          titulo: 'Categoria',
+        );
+        if (v != null) _controlador.escolherCategoria(porNome[v]);
+      },
+    ),
+  );
 
   /// Município e bairro vêm de `zonas`. Enquanto carregam, ou se falharem,
   /// a pílula diz isso em vez de mostrar opções inventadas.
@@ -131,7 +162,7 @@ class _EstadoEcraPesquisa extends ConsumerState<EcraPesquisa> {
                         controlador: _texto,
                         altura: 46,
                         destacado: true,
-                        textoDica: 'Canalizador, electricista…',
+                        textoDica: 'Nome ou serviço…',
                         estilo: estiloTexto(15, w: w600),
                         aoMudar: _controlador.definirTexto,
                         sufixo: GestureDetector(
@@ -153,6 +184,7 @@ class _EstadoEcraPesquisa extends ConsumerState<EcraPesquisa> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
+                    _filtroCategoria(filtro, ref.watch(categoriasProvider)),
                     ..._filtrosZona(filtro, ref.watch(zonasProvider)),
                     Pilula(
                       'Até 1 000 MT',

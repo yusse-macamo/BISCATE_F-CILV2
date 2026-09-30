@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../nucleo/dados/cliente_supabase.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
-import '../../../pedidos/dados/repositorios/pedidos_repositorio.dart';
+import '../../../../nucleo/dados/fotos_perfil.dart';
 import '../modelos/concurso_modelo.dart';
 
 final concursosRepositorioProvider = Provider<ConcursosRepositorio>(
@@ -34,23 +34,24 @@ class ConcursosRepositorio {
         return '${linha['id']}';
       });
 
-  /// Fotografia já comprimida, no mesmo bucket privado dos pedidos
-  /// (`{cliente_id}/{concurso_id}/{n}.jpg`), registada em `anexos`.
+  /// Fotografia já comprimida, em `publico/{clienteId}/concurso_{millis}.jpg`
+  /// (sem `upsert`: cada envio tem nome próprio), registada em `anexos` com o
+  /// `concurso_id`.
   Future<void> anexar({
     required String clienteId,
     required String concursoId,
-    required int indice,
     required Uint8List bytes,
   }) => executarTraduzido(() async {
-    final caminho = '$clienteId/$concursoId/$indice.jpg';
+    final caminho =
+        '$clienteId/concurso_${DateTime.now().millisecondsSinceEpoch}.jpg';
     await _cliente.storage
-        .from(bucketAnexos)
+        .from(bucketPublico)
         .uploadBinary(
           caminho,
           bytes,
           fileOptions: const FileOptions(
             contentType: 'image/jpeg',
-            upsert: true,
+            upsert: false,
           ),
         );
     await _cliente.from('anexos').insert({

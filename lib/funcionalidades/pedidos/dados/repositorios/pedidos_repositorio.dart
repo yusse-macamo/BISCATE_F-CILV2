@@ -4,15 +4,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../nucleo/dados/cliente_supabase.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
+import '../../../../nucleo/dados/fotos_perfil.dart';
 import '../modelos/pedido_modelo.dart';
 
 final pedidosRepositorioProvider = Provider<PedidosRepositorio>(
   (ref) => PedidosRepositorio(ref.watch(clienteSupabaseProvider)),
 );
-
-/// Bucket privado dos anexos dos pedidos: o cliente escreve em
-/// `{cliente_id}/{pedido_id}/`, e o prestador desse pedido lê.
-const bucketAnexos = 'anexos';
 
 class PedidosRepositorio {
   PedidosRepositorio(this._cliente);
@@ -38,23 +35,24 @@ class PedidosRepositorio {
     return '${linha['id']}';
   });
 
-  /// Envia uma fotografia já comprimida para o Storage e regista-a em
-  /// `anexos`. Com `upsert`, repetir depois de uma falha substitui o ficheiro.
+  /// Envia uma fotografia já comprimida para
+  /// `publico/{clienteId}/pedido_{millis}.jpg` (sem `upsert`: cada envio tem
+  /// nome próprio) e regista o caminho em `anexos` com o `pedido_id`.
   Future<void> anexar({
     required String clienteId,
     required String pedidoId,
-    required int indice,
     required Uint8List bytes,
   }) => executarTraduzido(() async {
-    final caminho = '$clienteId/$pedidoId/$indice.jpg';
+    final caminho =
+        '$clienteId/pedido_${DateTime.now().millisecondsSinceEpoch}.jpg';
     await _cliente.storage
-        .from(bucketAnexos)
+        .from(bucketPublico)
         .uploadBinary(
           caminho,
           bytes,
           fileOptions: const FileOptions(
             contentType: 'image/jpeg',
-            upsert: true,
+            upsert: false,
           ),
         );
     await _cliente.from('anexos').insert({

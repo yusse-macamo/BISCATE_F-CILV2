@@ -22,6 +22,7 @@ class CriteriosProcura {
   const CriteriosProcura({
     this.textoLivre,
     this.categoriaIds = const [],
+    this.categoriaId,
     this.municipio,
     this.zonaId,
     this.verificados = false,
@@ -30,11 +31,16 @@ class CriteriosProcura {
     this.limite = 50,
   });
 
-  /// Procurado em `titulo` e `bio` (e, via [categoriaIds], na categoria).
+  /// Procurado no nome do prestador (`perfis.nome`), em `titulo` e `bio`,
+  /// nos serviços a que deu preço e nos serviços próprios (e, via
+  /// [categoriaIds], na categoria).
   final String? textoLivre;
 
   /// Categorias cujo nome corresponde ao texto procurado.
   final List<String> categoriaIds;
+
+  /// Filtro por categoria escolhido pelo cliente (`null` = todas).
+  final String? categoriaId;
 
   /// Prestadores que atendem em pelo menos uma zona deste município.
   final String? municipio;
@@ -52,6 +58,7 @@ class CriteriosProcura {
       other is CriteriosProcura &&
       other.textoLivre == textoLivre &&
       listEquals(other.categoriaIds, categoriaIds) &&
+      other.categoriaId == categoriaId &&
       other.municipio == municipio &&
       other.zonaId == zonaId &&
       other.verificados == verificados &&
@@ -63,6 +70,7 @@ class CriteriosProcura {
   int get hashCode => Object.hash(
     textoLivre,
     Object.hashAll(categoriaIds),
+    categoriaId,
     municipio,
     zonaId,
     verificados,
@@ -113,11 +121,19 @@ class ProcuraRepositorio {
         if (criterios.municipio case final municipio?) {
           consulta = consulta.eq('municipio_filtro.zonas.municipio', municipio);
         }
+        if (criterios.categoriaId case final categoriaId?) {
+          consulta = consulta.eq('categoria_id', categoriaId);
+        }
         if (criterios.verificados) consulta = consulta.eq('verificado', true);
         if (criterios.avaliacaoMinima case final minima?) {
           consulta = consulta.gte('avaliacao_media', minima);
         }
-        if (_condicaoTexto(criterios) case final condicao?) {
+        final texto = _textoLimpo(criterios.textoLivre);
+        final porNomeOuServico = texto == null
+            ? const <String>{}
+            : await _prestadoresPorNomeOuServico(texto);
+        if (_condicaoTexto(texto, criterios.categoriaIds, porNomeOuServico)
+            case final condicao?) {
           consulta = consulta.or(condicao);
         }
 
@@ -167,20 +183,51 @@ class ProcuraRepositorio {
     );
   }
 
-  /// `or=(titulo.ilike.*x*,bio.ilike.*x*,categoria_id.in.(…))`, ou `null` se
-  /// não há texto nem categorias.
-  static String? _condicaoTexto(CriteriosProcura criterios) {
-    // Vírgulas, parênteses e asteriscos partem a sintaxe do filtro `or`.
-    final texto = criterios.textoLivre
-        ?.replaceAll(RegExp(r'[,()*%]'), ' ')
-        .trim();
+  /// Texto seguro para `ilike` e para o filtro `or`, ou `null` se vazio.
+  /// Vírgulas, parênteses, asteriscos e `%` partem a sintaxe dos filtros.
+  static String? _textoLimpo(String? texto) {
+    final limpo = texto?.replaceAll(RegExp(r'[,()*%]'), ' ').trim();
+    return limpo == null || limpo.isEmpty ? null : limpo;
+  }
+
+  /// `perfil_id` dos prestadores cujo nome, serviço com preço ou serviço
+  /// próprio contém [texto]. O filtro `or` não mistura colunas de tabelas
+  /// embebidas com as de `prestadores`, por isso estas procuras vão à parte
+  /// e entram na condição como `perfil_id.in.(…)`.
+  Future<Set<String>> _prestadoresPorNomeOuServico(String texto) async {
+    final padrao = '%$texto%';
+    final respostas = await Future.wait([
+      _cliente
+          .from('prestadores')
+          .select('perfil_id, perfis!prestadores_perfil_id_fkey!inner(nome)')
+          .ilike('perfis.nome', padrao),
+      _cliente
+          .from('precos_prestador')
+          .select('perfil_id:prestador_id, servicos!inner(nome)')
+          .ilike('servicos.nome', padrao),
+      _cliente
+          .from('servicos_proprios')
+          .select('perfil_id:prestador_id')
+          .ilike('nome', padrao),
+    ]);
+    return {
+      for (final linhas in respostas)
+        for (final l in linhas) '${l['perfil_id']}',
+    };
+  }
+
+  /// `or=(titulo.ilike.*x*,bio.ilike.*x*,categoria_id.in.(…),
+  /// perfil_id.in.(…))`, ou `null` se não há texto nem categorias.
+  static String? _condicaoTexto(
+    String? texto,
+    List<String> categoriaIds,
+    Set<String> perfilIds,
+  ) {
     final partes = [
-      if (texto != null && texto.isNotEmpty) ...[
-        'titulo.ilike.*$texto*',
-        'bio.ilike.*$texto*',
-      ],
-      if (criterios.categoriaIds.isNotEmpty)
-        'categoria_id.in.(${criterios.categoriaIds.join(',')})',
+      if (texto != null) ...['titulo.ilike.*$texto*', 'bio.ilike.*$texto*'],
+      if (categoriaIds.isNotEmpty)
+        'categoria_id.in.(${categoriaIds.join(',')})',
+      if (perfilIds.isNotEmpty) 'perfil_id.in.(${perfilIds.join(',')})',
     ];
     return partes.isEmpty ? null : partes.join(',');
   }

@@ -330,7 +330,6 @@ class PublicacaoControlador extends AutoDisposeNotifier<EstadoPublicacao> {
         await repositorio.anexar(
           clienteId: clienteId,
           concursoId: id,
-          indice: i,
           bytes: bytes,
         );
         if (_descartado) return;

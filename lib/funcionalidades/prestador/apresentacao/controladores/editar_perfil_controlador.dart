@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../nucleo/dados/excepcoes.dart';
+import '../../../../nucleo/utilitarios/imagens.dart';
 import '../../../autenticacao/apresentacao/controladores/sessao_controlador.dart';
 import '../../../autenticacao/apresentacao/controladores/validacoes.dart';
 import '../../../autenticacao/dados/repositorios/autenticacao_repositorio.dart';
@@ -133,6 +134,65 @@ class EdicaoPerfilControlador extends AutoDisposeNotifier<EstadoEdicao> {
     } on FalhaApp catch (falha) {
       state = EstadoEdicao(zonas: state.zonas, erroGuardar: falha.mensagem);
       return false;
+    }
+  }
+}
+
+/// `true` enquanto a nova foto de perfil está a ser enviada.
+final fotoPerfilControladorProvider =
+    NotifierProvider.autoDispose<FotoPerfilControlador, bool>(
+      FotoPerfilControlador.new,
+    );
+
+/// Troca a foto de perfil: comprime (largura máxima de 1600 px), envia para
+/// `publico/{perfilId}/perfil_{millis}.jpg` sem `upsert` e grava esse caminho
+/// em `perfis.foto`.
+class FotoPerfilControlador extends AutoDisposeNotifier<bool> {
+  @override
+  bool build() => false;
+
+  /// Devolve a mensagem de erro, ou `null` se correu bem ou se desistiu.
+  Future<String?> alterar(OrigemImagem origem) async {
+    if (state) return null;
+    final id = ref.read(autenticacaoRepositorioProvider).utilizadorId;
+    if (id == null) return 'Entre na sua conta para alterar a foto.';
+
+    final ImagemEscolhida? imagem;
+    try {
+      imagem = await ref.read(seletorImagemProvider).escolher(origem);
+    } catch (_) {
+      return 'Não foi possível abrir as fotografias. Autorize o acesso nas '
+          'definições.';
+    }
+    if (imagem == null) return null;
+
+    state = true;
+    try {
+      final Uint8List bytes;
+      try {
+        bytes = await ref
+            .read(compressorImagemProvider)
+            .comprimir(imagem.bytes);
+      } catch (_) {
+        throw const FalhaApp('Não foi possível preparar a fotografia.');
+      }
+      final repositorio = ref.read(prestadorRepositorioProvider);
+      final caminho = await repositorio.carregarImagem(
+        bucket: BucketsPrestador.publico,
+        perfilId: id,
+        tipo: 'perfil',
+        bytes: bytes,
+      );
+      await repositorio.gravarFotoPerfil(perfilId: id, caminho: caminho);
+      ref
+        ..invalidate(perfilEditavelProvider)
+        ..invalidate(painelProvider)
+        ..invalidate(perfilPrestadorProvider(id));
+      return null;
+    } on FalhaApp catch (falha) {
+      return falha.mensagem;
+    } finally {
+      state = false;
     }
   }
 }
