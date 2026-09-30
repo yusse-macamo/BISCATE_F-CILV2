@@ -39,6 +39,34 @@ final situacaoAssinaturaProvider =
       );
     });
 
+/// Pagamentos do próprio. Provider separado: se esta leitura falhar, os
+/// planos e a situação continuam visíveis.
+final pagamentosProvider = FutureProvider.autoDispose<List<PagamentoModelo>>((
+  ref,
+) async {
+  await ref.watch(sessaoProvider.selectAsync((sessao) => sessao?.user.id));
+  final id = ref.read(autenticacaoRepositorioProvider).utilizadorId;
+  if (id == null) {
+    throw const FalhaApp('Entre na sua conta para ver os seus pagamentos.');
+  }
+  return ref.watch(assinaturaRepositorioProvider).pagamentos(id);
+});
+
+/// Texto do selo no painel: o plano activo, "Grátis" no período gratuito,
+/// ou `null` (sem selo) se não tiver nenhum dos dois.
+String? textoSeloPlano(SituacaoAssinatura s) {
+  final a = s.assinatura;
+  if (a != null && a.activa) return a.planoNome;
+  final g = s.gratuito;
+  if (g != null && ((g.diasRestantes ?? 0) > 0 || (g.trabalhosRestantes ?? 0) > 0)) {
+    return 'Grátis';
+  }
+  return null;
+}
+
+/// "12/9/2026".
+String textoData(DateTime? d) => d == null ? '' : '${d.day}/${d.month}/${d.year}';
+
 /// A frase por baixo do título: plano activo, período gratuito, ou nada.
 String resumoSituacao(SituacaoAssinatura s) {
   final a = s.assinatura;

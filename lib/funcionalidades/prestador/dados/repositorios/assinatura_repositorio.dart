@@ -54,6 +54,21 @@ class EstadoGratuitoModelo {
   final int? trabalhosFeitos;
 }
 
+/// Linha de `pagamentos` do próprio prestador.
+class PagamentoModelo {
+  const PagamentoModelo({
+    required this.valor,
+    this.referencia,
+    this.data,
+    this.planoNome,
+  });
+
+  final int valor;
+  final String? referencia;
+  final DateTime? data;
+  final String? planoNome;
+}
+
 /// Só leitura: `planos`, `assinaturas`, `pagamentos` e `configuracoes` são
 /// escritos pelo servidor ou pelo administrador.
 class AssinaturaRepositorio {
@@ -96,6 +111,31 @@ class AssinaturaRepositorio {
           fim: DateTime.tryParse('${linha['fim']}')?.toLocal(),
         );
       });
+
+  /// Pagamentos do próprio, do mais recente para o mais antigo.
+  Future<List<PagamentoModelo>> pagamentos(
+    String prestadorId, {
+    int limite = 12,
+  }) => executarTraduzido(() async {
+    final linhas = await _cliente
+        .from('pagamentos')
+        .select('valor, referencia, data, assinaturas(planos(nome))')
+        .eq('prestador_id', prestadorId)
+        .order('data', ascending: false)
+        .limit(limite);
+    return [
+      for (final l in linhas)
+        PagamentoModelo(
+          valor: (l['valor'] as num?)?.toInt() ?? 0,
+          referencia: l['referencia'] as String?,
+          data: DateTime.tryParse('${l['data']}')?.toLocal(),
+          planoNome:
+              ((l['assinaturas'] as Map<String, dynamic>?)?['planos']
+                      as Map<String, dynamic>?)?['nome']
+                  as String?,
+        ),
+    ];
+  });
 
   Future<EstadoGratuitoModelo?> estadoGratuito(String prestadorId) =>
       executarTraduzido(() async {
