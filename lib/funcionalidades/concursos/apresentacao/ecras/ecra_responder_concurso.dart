@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../comum/widgets/componentes.dart';
+import '../../../../comum/widgets/galeria_anexos.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/tema/tema_app.dart';
 import '../../../../nucleo/utilitarios/formatacao_mt.dart';
@@ -99,6 +100,10 @@ class _EstadoEcraResponderConcurso
                 t.descricao,
                 style: estiloTexto(13.5, c: CoresApp.corpo, h: 1.45),
               ),
+            ],
+            if (t.fotosAnexos.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              GaleriaAnexos(t.fotosAnexos),
             ],
             const SizedBox(height: 8),
             Wrap(

@@ -154,6 +154,22 @@ void main() {
       expect(situacaoDe(pedido), SituacaoPedido.pendente);
     });
 
+    test('anexos: URL por caminho; linhas estragadas não rebentam', () {
+      final pedido = PedidoModelo.fromJson({
+        ..._pendente,
+        'anexos': [
+          {'id': 'a1', 'caminho': 'cliente-1/pedido_1.jpg'},
+          {'id': 'a2', 'caminho': null},
+          'lixo',
+        ],
+      }, urlAnexo: (caminho) => 'https://x/$caminho');
+      expect(pedido.fotosAnexos, ['https://x/cliente-1/pedido_1.jpg']);
+
+      final semEmbed = PedidoModelo.fromJson({..._pendente, 'anexos': null});
+      expect(semEmbed.fotosAnexos, isEmpty);
+      expect(semEmbed.numeroAnexos, 0);
+    });
+
     test('aceite com trabalho: em curso, e depois concluído', () {
       final aceite = PedidoModelo.fromJson({
         ..._pendente,

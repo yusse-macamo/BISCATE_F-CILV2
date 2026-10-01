@@ -57,6 +57,7 @@ class _EstadoEcraPropostas extends ConsumerState<EcraPropostas> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => EcraPrestadorEscolhido(
+          concursoId: concurso.id,
           nome: p.nome,
           servico: concurso.servico ?? concurso.titulo,
           preco: textoOrcamento(p.valor),

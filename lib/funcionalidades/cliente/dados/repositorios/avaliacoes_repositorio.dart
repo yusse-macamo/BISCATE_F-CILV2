@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../nucleo/dados/cliente_supabase.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
+import '../../../../nucleo/dados/leitura_json.dart';
 
 final avaliacoesRepositorioProvider = Provider<AvaliacoesRepositorio>(
   (ref) => AvaliacoesRepositorio(ref.watch(clienteSupabaseProvider)),
@@ -19,13 +20,13 @@ class AvaliacaoModelo {
   });
 
   factory AvaliacaoModelo.fromJson(Map<String, dynamic> json) {
-    final cliente = json['cliente'] as Map<String, dynamic>?;
+    final cliente = lerObjecto(json['cliente']);
     return AvaliacaoModelo(
       estrelas: (json['estrelas'] as num?)?.toInt() ?? 0,
       comentario: json['comentario'] as String?,
       recomenda: json['recomenda'] as bool?,
       criadoEm: DateTime.tryParse('${json['criado_em']}')?.toLocal(),
-      autor: cliente?['nome'] as String?,
+      autor: lerTexto(cliente?['nome']),
     );
   }
 

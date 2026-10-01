@@ -1,3 +1,5 @@
+import '../../../../nucleo/dados/leitura_json.dart';
+
 /// Valores do enum `urgencia` (coluna `concursos.quando`).
 enum Urgencia {
   hoje('Hoje'),
@@ -129,16 +131,20 @@ class ConcursoModelo {
     this.municipio,
     this.numeroPropostas,
     this.jaRespondido = false,
+    this.fotosAnexos = const [],
   });
 
+  /// [urlAnexo] converte o caminho de cada anexo (bucket `publico`) no URL
+  /// a mostrar; o repositório passa-o. Sem ele, fica o caminho.
   factory ConcursoModelo.fromJson(
     Map<String, dynamic> json, {
     String? prestadorId,
+    String? Function(String caminho)? urlAnexo,
   }) {
-    final zona = json['zonas'] as Map<String, dynamic>?;
-    final propostas = (json['propostas'] as List<dynamic>?)
-        ?.whereType<Map<String, dynamic>>()
-        .toList();
+    final zona = lerObjecto(json['zonas']);
+    final propostas = json['propostas'] is List
+        ? lerLista(json['propostas'])
+        : null;
     return ConcursoModelo(
       id: '${json['id']}',
       titulo: json['titulo'] as String? ?? 'Concurso',
@@ -149,9 +155,9 @@ class ConcursoModelo {
       quando: Urgencia.deTexto(json['quando'] as String?),
       fechaEm: DateTime.tryParse('${json['fecha_em']}')?.toLocal(),
       criadoEm: DateTime.tryParse('${json['criado_em']}')?.toLocal(),
-      servico: (json['servicos'] as Map<String, dynamic>?)?['nome'] as String?,
-      zona: zona?['nome'] as String?,
-      municipio: zona?['municipio'] as String?,
+      servico: lerTexto(lerObjecto(json['servicos'])?['nome']),
+      zona: lerTexto(zona?['nome']),
+      municipio: lerTexto(zona?['municipio']),
       // A lista de propostas embebida só traz o que a RLS deixa ver: ao
       // cliente, todas as do seu concurso; ao prestador, só as dele.
       numeroPropostas: propostas?.length,
@@ -160,6 +166,7 @@ class ConcursoModelo {
           (propostas ?? const []).any(
             (p) => '${p['prestador_id']}' == prestadorId,
           ),
+      fotosAnexos: lerAnexos(json['anexos'], urlAnexo ?? (c) => c),
     );
   }
 
@@ -179,6 +186,9 @@ class ConcursoModelo {
   final String? municipio;
   final int? numeroPropostas;
   final bool jaRespondido;
+
+  /// URLs das fotografias que o cliente juntou.
+  final List<String> fotosAnexos;
 }
 
 /// Faixa de referência de `vw_referencia_precos` (percentis 25 e 75).
@@ -240,20 +250,20 @@ class PropostaModelo {
   });
 
   factory PropostaModelo.fromJson(Map<String, dynamic> json) {
-    final prestador = json['prestadores'] as Map<String, dynamic>?;
-    final perfil = prestador?['perfis'] as Map<String, dynamic>?;
+    final prestador = lerObjecto(json['prestadores']);
+    final perfil = lerObjecto(prestador?['perfis']);
     return PropostaModelo(
       id: '${json['id']}',
       prestadorId: '${json['prestador_id']}',
-      nome: perfil?['nome'] as String? ?? 'Prestador',
+      nome: lerTexto(perfil?['nome']) ?? 'Prestador',
       tipo: TipoProposta.deTexto(json['tipo'] as String?),
       valor: (json['valor'] as num?)?.toInt() ?? 0,
       estado: EstadoProposta.deTexto(json['estado'] as String?),
       justificacao: json['justificacao'] as String?,
-      avaliacaoMedia: (prestador?['avaliacao_media'] as num?)?.toDouble(),
-      servicosFeitos: (prestador?['servicos_feitos'] as num?)?.toInt() ?? 0,
-      verificado: prestador?['verificado'] as bool? ?? false,
-      fotoCaminho: perfil?['foto'] as String?,
+      avaliacaoMedia: lerDecimal(prestador?['avaliacao_media']),
+      servicosFeitos: lerInteiro(prestador?['servicos_feitos']) ?? 0,
+      verificado: lerBooleano(prestador?['verificado']) ?? false,
+      fotoCaminho: lerTexto(perfil?['foto']),
     );
   }
 

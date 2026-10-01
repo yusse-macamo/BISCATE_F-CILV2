@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../nucleo/dados/cliente_supabase.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
+import '../../../../nucleo/dados/leitura_json.dart';
 
 final perfilClienteRepositorioProvider = Provider<PerfilClienteRepositorio>(
   (ref) => PerfilClienteRepositorio(ref.watch(clienteSupabaseProvider)),
@@ -20,12 +21,12 @@ class PerfilClienteModelo {
   });
 
   factory PerfilClienteModelo.fromJson(Map<String, dynamic> json) {
-    final zona = json['zonas'] as Map<String, dynamic>?;
+    final zona = lerObjecto(json['zonas']);
     return PerfilClienteModelo(
       nome: json['nome'] as String? ?? '',
       telefone: json['telefone'] as String?,
-      zona: zona?['nome'] as String?,
-      municipio: zona?['municipio'] as String? ?? json['municipio'] as String?,
+      zona: lerTexto(zona?['nome']),
+      municipio: lerTexto(zona?['municipio']) ?? json['municipio'] as String?,
     );
   }
 

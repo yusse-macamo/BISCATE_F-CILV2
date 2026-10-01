@@ -1,3 +1,5 @@
+import '../../../../nucleo/dados/leitura_json.dart';
+
 /// Um preço como o cliente o vê: serviço do catálogo ou próprio. `valor` nulo
 /// é "sob orçamento".
 class PrecoPublicoModelo {
@@ -39,25 +41,21 @@ class PrestadorPublicoModelo {
     Map<String, dynamic> json, {
     required String? fotoUrl,
   }) {
-    final perfil = json['perfis'] as Map<String, dynamic>?;
-    final categoria = json['categorias'] as Map<String, dynamic>?;
-    List<Map<String, dynamic>> lista(String chave) =>
-        (json[chave] as List<dynamic>? ?? const [])
-            .whereType<Map<String, dynamic>>()
-            .toList();
+    final perfil = lerObjecto(json['perfis']);
+    final categoria = lerObjecto(json['categorias']);
 
     return PrestadorPublicoModelo(
       perfilId: '${json['perfil_id']}',
-      nome: perfil?['nome'] as String? ?? '',
+      nome: lerTexto(perfil?['nome']) ?? '',
       fotoUrl: fotoUrl,
       titulo: json['titulo'] as String?,
       categoriaId: json['categoria_id'] == null
           ? null
           : '${json['categoria_id']}',
-      categoria: categoria?['nome'] as String?,
+      categoria: lerTexto(categoria?['nome']),
       zonas: [
-        for (final linha in lista('prestador_zonas'))
-          if (linha['zonas'] case {'nome': final String nome}) nome,
+        for (final linha in lerLista(json['prestador_zonas']))
+          ?lerTexto(lerObjecto(linha['zonas'])?['nome']),
       ],
       verificado: json['verificado'] as bool? ?? false,
       avaliacaoMedia: (json['avaliacao_media'] as num?)?.toDouble(),
@@ -67,18 +65,19 @@ class PrestadorPublicoModelo {
       bio: json['bio'] as String?,
       anosExperiencia: (json['anos_experiencia'] as num?)?.toInt(),
       precos: [
-        for (final linha in lista('precos_prestador'))
-          if (linha['servicos'] case {'nome': final String nome})
+        for (final linha in lerLista(json['precos_prestador']))
+          if (lerTexto(lerObjecto(linha['servicos'])?['nome']) case final nome?)
             PrecoPublicoModelo(
               servico: nome,
-              valor: (linha['valor'] as num?)?.toInt(),
+              valor: lerInteiro(linha['valor']),
               servicoId: '${linha['servico_id']}',
             ),
-        for (final linha in lista('servicos_proprios'))
-          PrecoPublicoModelo(
-            servico: linha['nome'] as String,
-            valor: (linha['valor'] as num?)?.toInt(),
-          ),
+        for (final linha in lerLista(json['servicos_proprios']))
+          if (lerTexto(linha['nome']) case final nome?)
+            PrecoPublicoModelo(
+              servico: nome,
+              valor: lerInteiro(linha['valor']),
+            ),
       ],
     );
   }

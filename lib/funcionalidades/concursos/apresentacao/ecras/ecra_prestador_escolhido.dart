@@ -1,25 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../comum/widgets/botoes_contacto.dart';
 import '../../../../comum/widgets/componentes.dart';
 import '../../../../nucleo/navegacao/navegacao.dart';
 import '../../../../nucleo/tema/tema_app.dart';
 import '../../../cliente/apresentacao/ecras/ecra_principal_cliente.dart';
+import '../controladores/concursos_controlador.dart';
 
 /// 20 · Cliente · Confirmação
-class EcraPrestadorEscolhido extends StatelessWidget {
+///
+/// "Ligar" e "WhatsApp" só aparecem quando a base devolve o telefone do
+/// prestador, o que acontece depois de a adjudicação criar o trabalho.
+class EcraPrestadorEscolhido extends ConsumerWidget {
   const EcraPrestadorEscolhido({
     super.key,
+    this.concursoId,
     this.nome = 'Fernando Chissano',
     this.servico = 'Canos da casa de banho',
     this.preco = '1 800 MT',
   });
 
+  /// Sem concurso (pré-visualização), não há contacto a mostrar.
+  final String? concursoId;
   final String nome;
   final String servico;
   final String preco;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final id = concursoId;
+    final telefone = id == null
+        ? null
+        : ref.watch(telefoneEscolhidoProvider(id)).valueOrNull;
     return EcraBase(
       child: ScrollPreenchido(
         preenchimento: const EdgeInsets.fromLTRB(24, 40, 24, 20),
@@ -87,23 +100,8 @@ class EcraPrestadorEscolhido extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          GrelhaUniforme(
-            colunas: 2,
-            children: [
-              BotaoContorno(
-                'Ligar',
-                altura: 52,
-                tamanhoFonte: 15,
-                aoTocar: () => mostrarAviso(context, 'A ligar para $nome…'),
-              ),
-              BotaoContorno(
-                'WhatsApp',
-                altura: 52,
-                tamanhoFonte: 15,
-                aoTocar: () => mostrarAviso(context, 'A abrir WhatsApp…'),
-              ),
-            ],
-          ),
+          if (telefone != null)
+            BotoesContacto(telefone: telefone, altura: 52, tamanhoFonte: 15),
           BotaoPrimario(
             'Ver em Meus pedidos',
             aoTocar: () => reiniciarCom(

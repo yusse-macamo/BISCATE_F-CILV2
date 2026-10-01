@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../nucleo/dados/cliente_supabase.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/dados/fotos_perfil.dart';
+import '../../../../nucleo/dados/leitura_json.dart';
 import '../modelos/concurso_modelo.dart';
 
 final concursosRepositorioProvider = Provider<ConcursosRepositorio>(
@@ -20,7 +21,32 @@ class ConcursosRepositorio {
       'id, cliente_id, titulo, descricao, estado, orcamento_cliente, quando, '
       'fecha_em, '
       'criado_em, servicos(nome), zonas(nome, municipio), '
-      'propostas(prestador_id)';
+      'propostas(prestador_id), anexos(caminho)';
+
+  ConcursoModelo _modelo(Map<String, dynamic> linha, {String? prestadorId}) =>
+      ConcursoModelo.fromJson(
+        linha,
+        prestadorId: prestadorId,
+        urlAnexo: (caminho) => urlFotoPerfil(_cliente, caminho),
+      );
+
+  /// Telefone do prestador escolhido, lido pelo trabalho que a adjudicação
+  /// criou. Só com o trabalho criado o contacto fica libertado; antes, ou se
+  /// a base não o devolver, é `null`.
+  Future<String?> telefoneDoEscolhido(
+    String concursoId,
+  ) => executarTraduzido(() async {
+    final linha = await _cliente
+        .from('trabalhos')
+        .select(
+          'prestador:prestadores(perfis!prestadores_perfil_id_fkey(telefone))',
+        )
+        .eq('concurso_id', concursoId)
+        .maybeSingle();
+    final prestador = lerObjecto(linha?['prestador']);
+    final telefone = lerTexto(lerObjecto(prestador?['perfis'])?['telefone']);
+    return telefone == null || telefone.isEmpty ? null : telefone;
+  });
 
   // ── Cliente ──────────────────────────────────────────────────────────────
 
@@ -89,7 +115,7 @@ class ConcursosRepositorio {
             .select(_campos)
             .eq('cliente_id', clienteId)
             .order('criado_em', ascending: false);
-        return [for (final l in linhas) ConcursoModelo.fromJson(l)];
+        return [for (final l in linhas) _modelo(l)];
       });
 
   Future<ConcursoModelo?> obter(String concursoId, {String? prestadorId}) =>
@@ -99,9 +125,7 @@ class ConcursosRepositorio {
             .select(_campos)
             .eq('id', concursoId)
             .maybeSingle();
-        return linha == null
-            ? null
-            : ConcursoModelo.fromJson(linha, prestadorId: prestadorId);
+        return linha == null ? null : _modelo(linha, prestadorId: prestadorId);
       });
 
   Future<List<PropostaModelo>> propostas(String concursoId) =>
@@ -144,10 +168,7 @@ class ConcursosRepositorio {
         .neq('cliente_id', prestadorId)
         .inFilter('zona_id', zonaIds)
         .order('criado_em', ascending: false);
-    return [
-      for (final l in linhas)
-        ConcursoModelo.fromJson(l, prestadorId: prestadorId),
-    ];
+    return [for (final l in linhas) _modelo(l, prestadorId: prestadorId)];
   });
 
   Future<void> responder(NovaPropostaModelo proposta) => executarTraduzido(

@@ -1,3 +1,5 @@
+import '../../../../nucleo/dados/leitura_json.dart';
+
 /// O prestador autenticado, como o painel o mostra: `prestadores` com o
 /// `perfis` associado, a categoria e as zonas.
 ///
@@ -24,19 +26,18 @@ class PainelPrestadorModelo {
     Map<String, dynamic> json, {
     required String? fotoUrl,
   }) {
-    final perfil = json['perfis'] as Map<String, dynamic>?;
-    final categoria = json['categorias'] as Map<String, dynamic>?;
-    final zonas = (json['prestador_zonas'] as List<dynamic>? ?? const [])
-        .map((linha) => (linha as Map<String, dynamic>)['zonas'])
-        .whereType<Map<String, dynamic>>()
-        .map((zona) => zona['nome'] as String)
-        .toList();
+    final perfil = lerObjecto(json['perfis']);
+    final categoria = lerObjecto(json['categorias']);
+    final zonas = [
+      for (final linha in lerLista(json['prestador_zonas']))
+        ?lerTexto(lerObjecto(linha['zonas'])?['nome']),
+    ];
     return PainelPrestadorModelo(
       perfilId: '${json['perfil_id']}',
-      nome: perfil?['nome'] as String? ?? '',
+      nome: lerTexto(perfil?['nome']) ?? '',
       fotoUrl: fotoUrl,
       titulo: json['titulo'] as String?,
-      categoria: categoria?['nome'] as String?,
+      categoria: lerTexto(categoria?['nome']),
       zonas: zonas,
       verificado: json['verificado'] as bool? ?? false,
       avaliacaoMedia: (json['avaliacao_media'] as num?)?.toDouble(),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../comum/widgets/botoes_contacto.dart';
 import '../../../../comum/widgets/componentes.dart';
+import '../../../../comum/widgets/galeria_anexos.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/tema/tema_app.dart';
 import '../../../../nucleo/utilitarios/formatacao_mt.dart';
@@ -247,6 +249,8 @@ class _CartaoTrabalhoConcurso extends StatelessWidget {
                   ),
               ],
             ),
+          if (cliente?.telefone case final telefone?)
+            BotoesContacto(telefone: telefone),
         ], 10),
       ),
     );
@@ -299,12 +303,16 @@ class _CartaoPedidoRecebido extends StatelessWidget {
               ),
             ],
           ),
+          // As fotografias vêem-se antes de aceitar, para o prestador
+          // perceber o trabalho.
+          if (pedido.fotosAnexos.isNotEmpty) GaleriaAnexos(pedido.fotosAnexos),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
               if (quando.isNotEmpty) Etiqueta(quando, margemH: 10),
-              if (pedido.numeroAnexos > 0)
+              // Anexos registados sem caminho legível: pelo menos a contagem.
+              if (pedido.fotosAnexos.isEmpty && pedido.numeroAnexos > 0)
                 Etiqueta(
                   pedido.numeroAnexos == 1
                       ? '1 fotografia'
@@ -341,6 +349,9 @@ class _CartaoPedidoRecebido extends StatelessWidget {
                   ),
               ],
             ),
+          // Só depois de aceitar a base devolve o telefone.
+          if (cliente?.telefone case final telefone?)
+            BotoesContacto(telefone: telefone),
           if (accoes)
             GrelhaUniforme(
               colunas: 2,

@@ -39,6 +39,20 @@ final concursoProvider = FutureProvider.autoDispose
           .obter(concursoId, prestadorId: id);
     });
 
+/// Telefone do prestador escolhido num concurso, `null` enquanto o contacto
+/// não estiver libertado. Uma falha também dá `null`: os botões de contacto
+/// ficam escondidos e o resto do ecrã continua.
+final telefoneEscolhidoProvider = FutureProvider.autoDispose
+    .family<String?, String>((ref, concursoId) async {
+      try {
+        return await ref
+            .watch(concursosRepositorioProvider)
+            .telefoneDoEscolhido(concursoId);
+      } on FalhaApp {
+        return null;
+      }
+    });
+
 final propostasProvider = FutureProvider.autoDispose
     .family<List<PropostaModelo>, String>((ref, concursoId) async {
       if (concursoId.isEmpty) return const [];

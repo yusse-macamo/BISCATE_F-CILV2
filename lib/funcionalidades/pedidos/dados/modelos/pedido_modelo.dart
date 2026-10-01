@@ -1,3 +1,5 @@
+import '../../../../nucleo/dados/leitura_json.dart';
+
 /// Valores do enum `estado_pedido` na base.
 enum EstadoPedido {
   pendente,
@@ -102,48 +104,50 @@ class PedidoModelo {
     this.criadoEm,
     this.motivoRejeicao,
     this.numeroAnexos = 0,
+    this.fotosAnexos = const [],
     this.prestadorNome,
     this.cliente,
     this.trabalho,
   });
 
-  factory PedidoModelo.fromJson(Map<String, dynamic> json) {
-    Map<String, dynamic>? objecto(Object? valor) => switch (valor) {
-      final Map<String, dynamic> mapa => mapa,
-      // Um embed um-para-muitos (ex.: `trabalhos`) vem como lista.
-      [final Map<String, dynamic> primeiro, ...] => primeiro,
-      _ => null,
-    };
-
-    final prestador = objecto(json['prestador']);
-    final cliente = objecto(json['cliente']);
-    final trabalho = objecto(json['trabalhos']);
+  /// [urlAnexo] converte o caminho de cada anexo (bucket `publico`) no URL
+  /// a mostrar; o repositório passa-o. Sem ele, fica o caminho.
+  factory PedidoModelo.fromJson(
+    Map<String, dynamic> json, {
+    String? Function(String caminho)? urlAnexo,
+  }) {
+    // `lerObjecto` também aceita um embed um-para-muitos (ex.: `trabalhos`),
+    // que vem como lista.
+    final prestador = lerObjecto(json['prestador']);
+    final cliente = lerObjecto(json['cliente']);
+    final trabalho = lerObjecto(json['trabalhos']);
     return PedidoModelo(
       id: '${json['id']}',
       estado: EstadoPedido.deTexto(json['estado'] as String?),
-      servico: objecto(json['servicos'])?['nome'] as String? ?? 'Serviço',
+      servico: lerTexto(lerObjecto(json['servicos'])?['nome']) ?? 'Serviço',
       descricao: json['descricao'] as String? ?? '',
       dataPreferida: DateTime.tryParse('${json['data_preferida']}'),
       periodo: PeriodoDia.deTexto(json['periodo'] as String?),
-      zona: objecto(json['zonas'])?['nome'] as String?,
+      zona: lerTexto(lerObjecto(json['zonas'])?['nome']),
       endereco: json['endereco'] as String?,
       criadoEm: DateTime.tryParse('${json['criado_em']}')?.toLocal(),
       motivoRejeicao: json['motivo_rejeicao'] as String?,
-      numeroAnexos: (json['anexos'] as List<dynamic>?)?.length ?? 0,
-      prestadorNome: objecto(prestador?['perfis'])?['nome'] as String?,
+      numeroAnexos: lerLista(json['anexos']).length,
+      fotosAnexos: lerAnexos(json['anexos'], urlAnexo ?? (c) => c),
+      prestadorNome: lerTexto(lerObjecto(prestador?['perfis'])?['nome']),
       // Antes de aceitar, a RLS esconde o perfil do cliente: `cliente` vem
       // nulo. Não é erro.
       cliente: cliente == null
           ? null
           : ContactoClienteModelo(
-              nome: cliente['nome'] as String? ?? '',
-              telefone: cliente['telefone'] as String?,
+              nome: lerTexto(cliente['nome']) ?? '',
+              telefone: lerTexto(cliente['telefone']),
             ),
       trabalho: trabalho == null
           ? null
           : TrabalhoResumoModelo(
-              estado: trabalho['estado'] as String? ?? '',
-              valorAcordado: (trabalho['valor_acordado'] as num?)?.toInt(),
+              estado: lerTexto(trabalho['estado']) ?? '',
+              valorAcordado: lerInteiro(trabalho['valor_acordado']),
             ),
     );
   }
@@ -159,6 +163,9 @@ class PedidoModelo {
   final DateTime? criadoEm;
   final String? motivoRejeicao;
   final int numeroAnexos;
+
+  /// URLs das fotografias que o cliente juntou.
+  final List<String> fotosAnexos;
   final String? prestadorNome;
   final ContactoClienteModelo? cliente;
   final TrabalhoResumoModelo? trabalho;

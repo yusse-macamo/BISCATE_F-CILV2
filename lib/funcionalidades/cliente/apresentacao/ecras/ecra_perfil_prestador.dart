@@ -125,41 +125,19 @@ class _Perfil extends ConsumerWidget {
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 14, 20, 22),
-                  child: Row(
-                    children: [
-                      BotaoContorno(
-                        'Ligar',
-                        largura: 52,
-                        altura: 52,
-                        tamanhoFonte: 12,
-                        aoTocar: () =>
-                            mostrarAviso(context, 'A ligar para ${p.nome}…'),
+                  // Sem "Ligar" nem "WhatsApp": o contacto do prestador só
+                  // fica libertado depois de haver trabalho entre os dois.
+                  child: BotaoPrimario(
+                    'Solicitar serviço',
+                    altura: 52,
+                    tamanhoFonte: 15,
+                    aoTocar: () => navegarPara(
+                      context,
+                      EcraSolicitacao(
+                        prestadorId: p.perfilId,
+                        nomePrestador: p.nome,
                       ),
-                      const SizedBox(width: 10),
-                      BotaoContorno(
-                        'WhatsApp',
-                        largura: 52,
-                        altura: 52,
-                        tamanhoFonte: 10.5,
-                        aoTocar: () =>
-                            mostrarAviso(context, 'A abrir WhatsApp…'),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: BotaoPrimario(
-                          'Solicitar serviço',
-                          altura: 52,
-                          tamanhoFonte: 15,
-                          aoTocar: () => navegarPara(
-                            context,
-                            EcraSolicitacao(
-                              prestadorId: p.perfilId,
-                              nomePrestador: p.nome,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),

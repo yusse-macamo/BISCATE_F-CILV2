@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../nucleo/dados/cliente_supabase.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
+import '../../../../nucleo/dados/leitura_json.dart';
 
 final assinaturaRepositorioProvider = Provider<AssinaturaRepositorio>(
   (ref) => AssinaturaRepositorio(ref.watch(clienteSupabaseProvider)),
@@ -103,10 +104,10 @@ class AssinaturaRepositorio {
             .limit(1)
             .maybeSingle();
         if (linha == null) return null;
-        final plano = linha['planos'] as Map<String, dynamic>?;
+        final plano = lerObjecto(linha['planos']);
         return AssinaturaModelo(
           planoId: '${linha['plano_id']}',
-          planoNome: plano?['nome'] as String? ?? 'Plano',
+          planoNome: lerTexto(plano?['nome']) ?? 'Plano',
           activa: linha['estado'] == 'activa',
           fim: DateTime.tryParse('${linha['fim']}')?.toLocal(),
         );
@@ -129,10 +130,9 @@ class AssinaturaRepositorio {
           valor: (l['valor'] as num?)?.toInt() ?? 0,
           referencia: l['referencia'] as String?,
           data: DateTime.tryParse('${l['data']}')?.toLocal(),
-          planoNome:
-              ((l['assinaturas'] as Map<String, dynamic>?)?['planos']
-                      as Map<String, dynamic>?)?['nome']
-                  as String?,
+          planoNome: lerTexto(
+            lerObjecto(lerObjecto(l['assinaturas'])?['planos'])?['nome'],
+          ),
         ),
     ];
   });

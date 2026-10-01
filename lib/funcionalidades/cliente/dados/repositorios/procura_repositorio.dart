@@ -6,6 +6,7 @@ import '../../../../nucleo/dados/cliente_supabase.dart';
 import '../../../../nucleo/dados/excepcoes.dart';
 import '../../../../nucleo/dados/fotos_perfil.dart';
 import '../modelos/prestador_publico_modelo.dart';
+import '../../../../nucleo/dados/leitura_json.dart';
 
 final procuraRepositorioProvider = Provider<ProcuraRepositorio>(
   (ref) => ProcuraRepositorio(ref.watch(clienteSupabaseProvider)),
@@ -176,10 +177,10 @@ class ProcuraRepositorio {
       });
 
   PrestadorPublicoModelo _modelo(Map<String, dynamic> linha) {
-    final perfil = linha['perfis'] as Map<String, dynamic>?;
+    final perfil = lerObjecto(linha['perfis']);
     return PrestadorPublicoModelo.fromJson(
       linha,
-      fotoUrl: urlFotoPerfil(_cliente, perfil?['foto'] as String?),
+      fotoUrl: urlFotoPerfil(_cliente, lerTexto(perfil?['foto'])),
     );
   }
 

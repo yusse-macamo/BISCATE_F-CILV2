@@ -8,6 +8,7 @@ import '../../../../nucleo/dados/fotos_perfil.dart';
 import '../modelos/novo_prestador_modelo.dart';
 import '../modelos/painel_prestador_modelo.dart';
 import '../modelos/perfil_editavel_modelo.dart';
+import '../../../../nucleo/dados/leitura_json.dart';
 
 final prestadorRepositorioProvider = Provider<PrestadorRepositorio>(
   (ref) => PrestadorRepositorio(ref.watch(clienteSupabaseProvider)),
@@ -56,10 +57,10 @@ class PrestadorRepositorio {
             .eq('perfil_id', perfilId)
             .maybeSingle();
         if (linha == null) return null;
-        final perfil = linha['perfis'] as Map<String, dynamic>?;
+        final perfil = lerObjecto(linha['perfis']);
         return PainelPrestadorModelo.fromJson(
           linha,
-          fotoUrl: urlFotoPerfil(_cliente, perfil?['foto'] as String?),
+          fotoUrl: urlFotoPerfil(_cliente, lerTexto(perfil?['foto'])),
         );
       });
 
@@ -77,21 +78,18 @@ class PrestadorRepositorio {
             .eq('perfil_id', perfilId)
             .maybeSingle();
         if (linha == null) return null;
-        final perfil = linha['perfis'] as Map<String, dynamic>?;
+        final perfil = lerObjecto(linha['perfis']);
         return PerfilEditavelModelo(
           titulo: linha['titulo'] as String? ?? '',
           bio: linha['bio'] as String? ?? '',
           anosExperiencia: (linha['anos_experiencia'] as num?)?.toInt(),
-          categoria:
-              (linha['categorias'] as Map<String, dynamic>?)?['nome']
-                  as String?,
+          categoria: lerTexto(lerObjecto(linha['categorias'])?['nome']),
           zonaIds: {
-            for (final z
-                in (linha['prestador_zonas'] as List<dynamic>? ?? const []))
-              '${(z as Map<String, dynamic>)['zona_id']}',
+            for (final z in lerLista(linha['prestador_zonas']))
+              if (z['zona_id'] case final zonaId?) '$zonaId',
           },
-          telefone: perfil?['telefone'] as String? ?? '',
-          fotoUrl: urlFotoPerfil(_cliente, perfil?['foto'] as String?),
+          telefone: lerTexto(perfil?['telefone']) ?? '',
+          fotoUrl: urlFotoPerfil(_cliente, lerTexto(perfil?['foto'])),
         );
       });
 

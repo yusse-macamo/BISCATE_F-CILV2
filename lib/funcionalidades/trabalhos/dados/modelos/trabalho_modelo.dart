@@ -1,4 +1,5 @@
 import '../../../pedidos/dados/modelos/pedido_modelo.dart';
+import '../../../../nucleo/dados/leitura_json.dart';
 
 /// Um trabalho (`trabalhos`), criado pelo servidor quando o prestador aceita
 /// um pedido (`aceitar_pedido`) ou quando o cliente escolhe uma proposta
@@ -22,40 +23,35 @@ class TrabalhoModelo {
   });
 
   factory TrabalhoModelo.fromJson(Map<String, dynamic> json) {
-    Map<String, dynamic>? objecto(Object? v) => switch (v) {
-      final Map<String, dynamic> m => m,
-      [final Map<String, dynamic> m, ...] => m,
-      _ => null,
-    };
-    final prestador = objecto(json['prestador']);
-    final concurso = objecto(json['concursos']);
-    final cliente = objecto(json['cliente']);
+    final prestador = lerObjecto(json['prestador']);
+    final concurso = lerObjecto(json['concursos']);
+    final cliente = lerObjecto(json['cliente']);
     return TrabalhoModelo(
       id: '${json['id']}',
       estado: json['estado'] as String? ?? '',
       prestadorId: '${json['prestador_id']}',
       servico:
-          objecto(json['servicos'])?['nome'] as String? ??
-          concurso?['titulo'] as String? ??
+          lerTexto(lerObjecto(json['servicos'])?['nome']) ??
+          lerTexto(concurso?['titulo']) ??
           'Serviço',
       valorAcordado: (json['valor_acordado'] as num?)?.toInt(),
-      prestadorNome: objecto(prestador?['perfis'])?['nome'] as String?,
+      prestadorNome: lerTexto(lerObjecto(prestador?['perfis'])?['nome']),
       origemConcurso: json['concurso_id'] != null,
       criadoEm: DateTime.tryParse('${json['criado_em']}')?.toLocal(),
       concluidoEm: DateTime.tryParse('${json['concluido_em']}')?.toLocal(),
       // Uma avaliação por trabalho; a lista embebida diz se já existe.
-      avaliado: (json['avaliacoes'] as List<dynamic>?)?.isNotEmpty ?? false,
-      descricao: concurso?['descricao'] as String?,
-      zona: objecto(concurso?['zonas'])?['nome'] as String?,
-      endereco: concurso?['endereco'] as String?,
+      avaliado: lerLista(json['avaliacoes']).isNotEmpty,
+      descricao: lerTexto(concurso?['descricao']),
+      zona: lerTexto(lerObjecto(concurso?['zonas'])?['nome']),
+      endereco: lerTexto(concurso?['endereco']),
       // Com o trabalho criado, a RLS deixa o prestador ler o perfil do
       // cliente. Se ainda assim vier nulo, o ecrã diz que não está
       // disponível; não é erro.
       cliente: cliente == null
           ? null
           : ContactoClienteModelo(
-              nome: cliente['nome'] as String? ?? '',
-              telefone: cliente['telefone'] as String?,
+              nome: lerTexto(cliente['nome']) ?? '',
+              telefone: lerTexto(cliente['telefone']),
             ),
     );
   }

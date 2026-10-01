@@ -19,7 +19,7 @@ class PedidosRepositorio {
   static const _campos =
       'id, estado, descricao, data_preferida, periodo, endereco, criado_em, '
       'motivo_rejeicao, '
-      'servicos(nome), zonas(nome), anexos(id), '
+      'servicos(nome), zonas(nome), anexos(id, caminho), '
       'trabalhos(estado, valor_acordado), '
       'prestador:prestadores(perfis!prestadores_perfil_id_fkey(nome)), '
       // Só legível depois de existir o trabalho; antes, a RLS devolve nulo.
@@ -68,7 +68,7 @@ class PedidosRepositorio {
             .select(_campos)
             .eq('cliente_id', clienteId)
             .order('criado_em', ascending: false);
-        return linhas.map(PedidoModelo.fromJson).toList();
+        return [for (final l in linhas) _modelo(l)];
       });
 
   Future<List<PedidoModelo>> doPrestador(String prestadorId) =>
@@ -78,8 +78,13 @@ class PedidosRepositorio {
             .select(_campos)
             .eq('prestador_id', prestadorId)
             .order('criado_em', ascending: false);
-        return linhas.map(PedidoModelo.fromJson).toList();
+        return [for (final l in linhas) _modelo(l)];
       });
+
+  PedidoModelo _modelo(Map<String, dynamic> linha) => PedidoModelo.fromJson(
+    linha,
+    urlAnexo: (caminho) => urlFotoPerfil(_cliente, caminho),
+  );
 
   /// Aceita pela função do servidor, que cria a linha em `trabalhos`. A app
   /// nunca insere em `trabalhos`. [valorAcordado] pode ser nulo.
